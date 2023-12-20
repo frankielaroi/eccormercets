@@ -25,7 +25,7 @@ const SideDrawer = ({
           variant="subtitle1"
           className="p-5 font-serif transition duration-150 ease-out hover:ease-in bg-[#B6BBC4] hover:bg-[#161A30]"
         >
-          Categories
+          <Link href='./categories' prefetch>Categories</Link> 
         </Typography>
         <Typography
           variant="subtitle1"

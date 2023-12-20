@@ -1,8 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { Typography, Box, Button, IconButton } from '@mui/material';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
-export default function Item() {
+import { Box, Button } from '@mui/material';
+export default  function Item() {
   const [selectedHeader, setSelectedHeader] = useState("All");
   const [items, setItems] = useState([]);
 
@@ -14,10 +13,12 @@ export default function Item() {
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
+ 
+   
+ 
   const handleHeaderChange = (header: string) => {
-    setSelectedHeader(header);
+    setSelectedHeader(header.toLowerCase());
   };
-
 
   const ArrivalItem = ({ item }: { item: any }) => {
     return (
@@ -32,7 +33,7 @@ export default function Item() {
         </a>
         <div className="mt-4">
           <h3 className="text-gray-500 text-xs tracking-widest title-font mb-1">
-            {item.Category}
+            {item.category}
           </h3>
           <h2 className="text-gray-900 title-font text-lg font-medium">
             {item.name}
@@ -43,25 +44,26 @@ export default function Item() {
       </div>
     )
   }
-
-  const filterItemsByCategory = () => {
+const filterItemsByCategory = () => {
     let filteredItems;
+  if (!Array.isArray(items)) {
+    return [];
+  }
 
-    if (!Array.isArray(items)) {
-      return [];
-    }
+  if (selectedHeader === "All") {
+    filteredItems = items;
+  } else {
+    filteredItems = items.filter(
+      (item: any) => item.category === selectedHeader
+    );
+  }
 
-    if (selectedHeader === "All") {
-      filteredItems = items;
-    } else {
-      filteredItems = items.filter(
-        (item: any) => item.Category === selectedHeader
-      );
-    }
+  // Return only the first four items
+  return filteredItems
+};
 
-    // Return only the first four items
-    return filteredItems.slice(0, 20);
-  };
+
+
   return (
     <div>
       <div className="flex flex-row justify-between">

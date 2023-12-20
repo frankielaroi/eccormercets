@@ -19,7 +19,7 @@ const Arrivals = ({ onAddToCart }: { onAddToCart: (product: any) => void }) => {
 
   useEffect(() => {
     // Fetch data from the API
-    fetch('http://localhost:3001/next/products')
+    fetch('../../public/item.json')
       .then((response) => response.json())
       .then((data) => setItems(data))
       .catch((error) => console.error('Error fetching data:', error));

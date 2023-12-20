@@ -9,8 +9,7 @@ import CloudLogo from './cloudlogo';
 import Banner from './banners/banner';
 import Carousel from './carousel';
 import Stat from './stats';
-import { Footer } from './footer';
-import Preloader from './preloader';
+import Footer  from './footer';
 import Link from 'next/link';
 
 
