@@ -1,46 +1,93 @@
-// Cart.js
+import React, { useEffect, useState } from "react";
+import Drawer from "@mui/material/Drawer";
+import IconButton from "@mui/material/IconButton";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { Clear,ShoppingCart, ShoppingCartCheckout } from "@mui/icons-material";
+import { Button, Typography } from "@mui/material";
+import { relative } from "path";
 
-import React, { useEffect, useState } from 'react';
-import Drawer from '@mui/material/Drawer';
-
-const Cart = ({ isOpen, onClose }: {
+const Cart = ({
+  isOpen,
+  onClose,
+}: {
   isOpen: boolean;
   onClose: () => void;
 }) => {
   interface CartItem {
+    index: number;
     id: string;
     name: string;
-    price: number; 
+    selling_price: number;
+    description: string;
+    images: string,
+    color:string
   }
 
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-  // Load cart items from localStorage on component mount
   useEffect(() => {
-    const savedCartItems = localStorage.getItem("cart");
-    if (savedCartItems) {
-      setCartItems(JSON.parse(savedCartItems));
+    // Fetch items from local storage when the component mounts
+    const storedItems = localStorage.getItem("cartItems");
+    if (storedItems) {
+      const parsedItems = JSON.parse(storedItems);
+      setCartItems(parsedItems);
     }
   }, []);
 
-  // Save cart items to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cartItems));
-  }, [cartItems]);
+  const calculateTotalPrice = () => {
+    return cartItems.reduce((total, item) => total + item.selling_price, 0).toFixed(2);
+  };
+
+ const handleRemoveFromCart = (item: CartItem) => {
+  // Filter out the specific item by its id
+  const updatedCartItems = cartItems.filter((cartItem) => cartItem.index !== item.index);
+
+  // Update the state with the new cart items
+  setCartItems(updatedCartItems);
+
+  // Save the updated items back to local storage
+  localStorage.setItem('cartItems', JSON.stringify(updatedCartItems));
+};
 
   return (
-    <Drawer anchor="right" open={isOpen} onClose={onClose}>
-      <h2>Shopping Cart</h2>
+    <Drawer anchor="right" open={isOpen} onClose={onClose} sx={{
+      maxWidth:20
+    }}>
+      <div className="flex flex-col place-content-between">
+      <div className="flex flex-row place-content-between"> <h2 className="p-5"><ShoppingCart sx={{minHeight:30,minWidth:30}}/> Shopping Cart</h2>
+      <IconButton onClick={onClose} sx={{width:50,height:50}}><Clear sx={{}}/></IconButton></div>
       <ul>
-        {cartItems.map((item) => (
-          <li key={item.id}>
-            {item.name} - ${item.price}
-          </li>
-        ))}
+        {cartItems &&
+          cartItems.length > 0 &&
+          cartItems.map((item) => {
+            return (
+              <li key={item.id}>
+               <div className="flex flex-row"> <img src={item.images} width='40%' height='30%'/>
+                  <div className="flex flex-col"> {item.name}
+                     <Typography variant="body1">{item.color}</Typography>
+                    <IconButton onClick={() => handleRemoveFromCart(item)} sx={{
+                      maxWidth: 50,
+                      maxHeight:50,
+                    }}>
+                     
+                  <DeleteIcon className="border-2	border-solid	border-inherit"/>
+                    </IconButton>
+                  </div>
+                  <div>Price: ${item.selling_price}</div></div>
+              </li>
+            );
+          })}
       </ul>
+        <div >
+          <p className="pt-20">Total Price: ${calculateTotalPrice()}</p></div>
+        <Button variant="outlined" fullWidth sx={{
+          width: 250,
+          height: 30,
+          marginTop: 5,
+        }}
+startIcon={<ShoppingCartCheckout />}>CHECKOUT</Button>      </div>
     </Drawer>
   );
 };
-        
 
 export default Cart;

@@ -1,59 +1,83 @@
 // Arrivals.js
 'use client'
+import { get, ref, onValue } from 'firebase/database';
 import React, { useState, useEffect } from 'react';
 import { Typography, Box, Button, IconButton } from '@mui/material';
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-
-
-
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-
 import Cart from './cart'; // Make sure to import the correct path
 import Link from 'next/link';
+import { database } from "./firebase";
 
 const Arrivals = ({ onAddToCart }: { onAddToCart: (product: any) => void }) => {
 
   const [items, setItems] = useState([]);
   const [selectedHeader, setSelectedHeader] = useState('All');
   const [showCart, setShowCart] = useState(false);
+   interface Item {
+  Category: string;
+  availability: boolean;
+  average_rating: number;
+  breadcrumbs: string;
+  color: string;
+  images: string; // Assuming images is a string URL, adjust if it's an array
+  index: number;
+  name: string;
+  selling_price: number;
+  // Add other properties if needed
+}
 
-  useEffect(() => {
-    // Fetch data from the API
-    fetch('../../public/item.json')
-      .then((response) => response.json())
-      .then((data) => setItems(data))
-      .catch((error) => console.error('Error fetching data:', error));
-  }, []);
+ useEffect(() => {
+  const itemsRef = ref(database, 'items');
 
+  try {
+    onValue(itemsRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const itemsData: Item[] = Object.values(snapshot.val());
+        setItems(itemsData);
+      } else {
+        setItems([]);
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+}, []);
+ 
   const handleHeaderChange = (header: string) => {
     setSelectedHeader(header);
   };
 
 
 
-const handleAddToCart = (item: any) => {
-    onAddToCart(item);
+  const ArrivalItem = ({ item }: { item: any }) => {
+  const handleAddToCart = (item: any) => {
+    // Save item to local storage
+    localStorage.setItem('cartItems', JSON.stringify([...JSON.parse(localStorage.getItem('cartItems') || '[]'), item]));
   };
 
-
-  const ArrivalItem = ({ item }: { item: any }) => (
+  return (
     <div className="lg:w-1/4 md:w-1/2 p-4 w-full">
       <a className="block relative h-48 rounded overflow-hidden">
-        <img
+        <img 
           src={item.images}
           alt="Your Image Alt Text"
           width={1920}
           height={1080}
         />
       </a>
+
       <div className="mt-4">
         <h3 className="text-gray-500 text-xs tracking-widest title-font mb-1">
           {item.Category}
         </h3>
+
         <h2 className="text-gray-900 title-font text-lg font-medium">
           {item.name}
         </h2>
+
         <p className="mt-1">${item.selling_price}</p>
+
         <IconButton
           onClick={() => handleAddToCart(item)}
           color="primary"
@@ -63,7 +87,8 @@ const handleAddToCart = (item: any) => {
         </IconButton>
       </div>
     </div>
-  );
+);
+  };
 
   const filterItemsByCategory = () => {
     let filteredItems;
@@ -139,9 +164,6 @@ const handleAddToCart = (item: any) => {
         >
           <Link href="./categories"> EXPLORE MORE</Link>
         </Button>
-        {showCart && (
-          <Cart isOpen={showCart} onClose={() => setShowCart(false)} />
-        )}
       </div>
     </div>
   );

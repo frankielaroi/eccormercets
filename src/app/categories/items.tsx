@@ -1,26 +1,54 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { Box, Button } from '@mui/material';
-export default  function Item() {
+import { Box, Button, IconButton } from '@mui/material';
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import { database } from '../firebase';
+import { ref, onValue, getDatabase } from 'firebase/database';
+
+export default function Item() {
   const [selectedHeader, setSelectedHeader] = useState("All");
   const [items, setItems] = useState([]);
+ interface Item {
+  Category: string;
+  availability: boolean;
+  average_rating: number;
+  breadcrumbs: string;
+  color: string;
+  images: string; // Assuming images is a string URL, adjust if it's an array
+  index: number;
+  name: string;
+  selling_price: number;
+  // Add other properties if needed
+}
 
-  useEffect(() => {
-    // Fetch data from the API
-    fetch("http://localhost:3001/next/products")
-      .then((response) => response.json())
-      .then((data) => setItems(data))
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
+ useEffect(() => {
+  const itemsRef = ref(database, 'items');
 
- 
-   
+  try {
+    onValue(itemsRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const itemsData: Item[] = Object.values(snapshot.val());
+        setItems(itemsData);
+      } else {
+        setItems([]);
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+}, []);
+
  
   const handleHeaderChange = (header: string) => {
     setSelectedHeader(header.toLowerCase());
   };
 
   const ArrivalItem = ({ item }: { item: any }) => {
+     const handleAddToCart = (item: any) => {
+    // Save item to local storage
+    localStorage.setItem('cartItems', JSON.stringify([...JSON.parse(localStorage.getItem('cartItems') || '[]'), item]));
+  };
+
     return (
       <div className="lg:w-1/4 md:w-1/2 p-4 w-full">
         <a className="block relative h-48 rounded overflow-hidden">
@@ -40,6 +68,13 @@ export default  function Item() {
           </h2>
           <p className="mt-1">${item.selling_price}
           </p>
+           <IconButton
+          onClick={() => handleAddToCart(item)}
+          color="primary"
+          aria-label="Add to Cart"
+          >
+            <ShoppingCartIcon />
+        </IconButton>
         </div>
       </div>
     )

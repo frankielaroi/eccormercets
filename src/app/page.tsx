@@ -1,5 +1,5 @@
 'use client'
-import React, { useState,useEffect } from 'react';
+import React, {  } from 'react';
 import Header from './header';
 import Lady from '../../public/image 10.png';
 import Image from 'next/image';
@@ -27,9 +27,8 @@ export default function Home() {
           EXPLORE MORE</Link>
         </Button></div>
       </div>
-      <Arrivals onAddToCart={function (product: any): void {
-          throw new Error('Function not implemented.');
-        } }  />
+      <Arrivals onAddToCart={(product) => {}}
+  />
       <CloudLogo></CloudLogo>
       <Banner />
       <Carousel />
