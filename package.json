@@ -16,6 +16,7 @@
     "axios": "^1.6.3",
     "firebase": "^10.7.1",
     "fs": "^0.0.1-security",
+    "js-cookie": "^3.0.5",
     "next": "14.0.4",
     "pure-react-carousel": "^1.30.1",
     "react": "^18",
@@ -24,6 +25,7 @@
     "redux": "^5.0.0"
   },
   "devDependencies": {
+    "@types/js-cookie": "^3.0.6",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

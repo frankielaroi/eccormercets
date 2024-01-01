@@ -5,6 +5,7 @@ import Footer from '../../footer'
 import { useParams } from 'next/navigation';
 import { database } from '../../firebase';
 import { get, ref } from 'firebase/database';
+import { Avatar } from '@mui/material';
 interface User {
     uid: string;
     email: string,
@@ -37,9 +38,11 @@ export default function Account() {
     });
     return (
         <div className='bg-[#00000065]'>
-            <Header item={undefined} />
-            {uid}
-            {}
+            <Header item={undefined} /> 
+            <Avatar src={user?.photoURL} sx={{
+                display: 'flex',
+                placeContent:'center'
+            }} />
             <Footer />
         </div>
     )

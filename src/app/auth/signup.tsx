@@ -1,101 +1,86 @@
-'use client'
-// Import the necessary Firebase modules
-import React, { useState } from "react";
-import { GoogleAuthProvider, FacebookAuthProvider, signInWithPopup, getAuth, GithubAuthProvider, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
-import { auth, database } from "../firebase";
-import { getDatabase, ref, set, get } from "firebase/database";
-import { Apple, Facebook, Google } from "@mui/icons-material";
-import { useRouter } from "next/navigation";
-import Account from "../user/[uid]/page";
+'use client';
+import Cookies from 'js-cookie';
+import React, { useState } from 'react';
+import { GoogleAuthProvider, FacebookAuthProvider, signInWithPopup, getAuth, GithubAuthProvider, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import { auth, database } from '../firebase';
+import { getDatabase, ref, set, get } from 'firebase/database';
+import { Apple, Facebook, Google } from '@mui/icons-material';
+import { useRouter } from 'next/navigation';
+import Account from '../user/[uid]/page';
 
 export default function Signup() {
-  // State for form input values
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [termsChecked, setTermsChecked] = useState(false);
-  const [name, setName] = useState("");
+  const [name, setName] = useState('');
 
-  // Validation errors
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [termsError, setTermsError] = useState("");
-  const [nameError,setNameError]=useState("")
-   const router = useRouter();
-  // Function to handle email input change
-  const handleEmailChange = (e: { target: { value: React.SetStateAction<string> } }) => {
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [termsError, setTermsError] = useState('');
+  const [nameError, setNameError] = useState('');
+
+  const router = useRouter();
+
+  const handleEmailChange = (e: { target: { value: React.SetStateAction<string>; }; }) => {
     setEmail(e.target.value);
-    setEmailError(""); // Reset error when user types
+    setEmailError('');
   };
-  const handleNameChange = (e: { target: { value: React.SetStateAction<string> } }) => {
+
+  const handleNameChange = (e: { target: { value: React.SetStateAction<string>; }; }) => {
     setName(e.target.value);
-    setNameError("");
-}
-  // Function to handle password input change
-  const handlePasswordChange = (e: { target: { value: React.SetStateAction<string> } }) => {
-    setPassword(e.target.value);
-    setPasswordError(""); // Reset error when user types
+    setNameError('');
   };
 
-  // Function to handle terms checkbox change
-  const handleTermsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  setTermsChecked(e.target.checked);
-  setTermsError(""); // Reset error when user checks/unchecks
-};
+  const handlePasswordChange = (e: { target: { value: React.SetStateAction<string>; }; }) => {
+    setPassword(e.target.value);
+    setPasswordError('');
+  };
 
+  const handleTermsChange = (e: { target: { checked: boolean | ((prevState: boolean) => boolean); }; }) => {
+    setTermsChecked(e.target.checked);
+    setTermsError('');
+  };
 
- const signIn = async () => {
-  try {
-    const userCredential = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
+  const signIn = async () => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      await sendEmailVerification(user);
 
-    // Send verification email
-    const user = userCredential.user;
-    await sendEmailVerification(user);
+      const userRef = ref(database, `users/${user.uid}`);
+      const snapshot = await get(userRef);
 
-    // Check if the user already exists in the database
-    const userRef = ref(database, `users/${user.uid}`);
-    const snapshot = await get(userRef);
+      if (snapshot.exists()) {
+        console.log('User already exists');
+        return;
+      }
 
-    if (snapshot.exists()) {
-      // User already exists
-      console.log("User already exists");
-      // You can set an error state here and display a message to the user
-      return;
+      await set(userRef, {
+        email: user.email,
+        providerId: user.providerData[0].providerId,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
+        createdAt: Date.now(),
+        lastLogin: Date.now(),
+      });
+
+      console.log('Verification email sent');
+      Cookies.set('uid', user.uid, { secure: true, httpOnly: true });
+      Cookies.set('isLoggedIn', 'true', { secure: true, httpOnly: true });
+
+      console.log('User ID:', user.uid);
+      console.log('Login Status:', true);
+
+      router.push(`../user/${user.uid}`);
+    } catch (err:any) {
+      if (err.code === 'auth/email-already-in-use') {
+        console.error('Email already in use:', err.message);
+      } else {
+        console.error(err);
+      }
     }
+  };
 
-    // Create a user in the database with UID
-    await set(userRef, {
-      email: user.email,
-      providerId: user.providerData[0].providerId,
-      displayName: user.displayName,
-      photoURL: user.photoURL,
-      createdAt: Date.now(),
-      lastLogin: Date.now(),
-      // Add other user details if needed
-    });
-
-    alert("Verification email sent");
-     setUserActive(true, user.uid);
-
-    // Redirect the user to the sign-in page after successful registration
-    // You can use a library like react-router-dom for navigation
-    // Example: history.push("/sign-in");
-  } catch (err:any) {
-    // Check for specific error codes
-    if (err.code === "auth/email-already-in-use") {
-      console.error("Email already in use:", err.message);
-      // Set an error state and display a message to the user
-    } else {
-      console.error(err);
-    }
-  }
-};
-
-
-  // Function to handle GitHub login
   const handleGitHubLogin = async () => {
     try {
       const provider = new GithubAuthProvider();
@@ -103,90 +88,90 @@ export default function Signup() {
       const user = result.user;
 
       if (user) {
-        // Check if the user already exists in the database
         const userRef = ref(database, `users/${user.uid}`);
         const snapshot = await get(userRef);
 
         if (!snapshot.exists()) {
-          // Create a user in the database with GitHub UID
           await set(userRef, {
-             email: user.email,
-        providerId: user.providerData[0].providerId,
-        displayName: user.displayName,
-        photoURL: user.photoURL,
-        createdAt: Date.now(),
-        lastLogin:Date.now()
-            // Add other user details if needed
+            email: user.email,
+            providerId: user.providerData[0].providerId,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+            createdAt: Date.now(),
+            lastLogin: Date.now(),
           });
         }
 
-        console.log("GitHub login successful");
-        // Additional logic if needed
-        const setUserActive = (isActive: boolean, userId: string) => {
-setUserActive(true, user.uid);
-        }; 
+        console.log('GitHub login successful');
+        Cookies.set('uid', user.uid, { secure: true, httpOnly: true });
+        Cookies.set('isLoggedIn', 'true', { secure: true, httpOnly: true });
 
+        console.log('User ID:', user.uid);
+        console.log('Login Status:', true);
+
+        router.push(`../user/${user.uid}`);
       }
     } catch (error) {
-      console.error("GitHub login failed:", error);
+      console.error('GitHub login failed:', error);
     }
   };
 
-// Function to handle Google login
-const handleGoogleLogin = async () => {
-  try {
+  const handleGoogleLogin = async () => {
+    try {
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
 
-    if (user) {
-      const userRef = ref(database, `users/${user.uid}`);
-      const snapshot = await get(userRef);
+      if (user) {
+        const userRef = ref(database, `users/${user.uid}`);
+        const snapshot = await get(userRef);
 
-      if (!snapshot.exists()) {
-        await set(userRef, {
-          email: user.email,
-          providerId: user.providerData[0].providerId,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-          createdAt: Date.now(),
-          lastLogin: Date.now(),
-        });
+        if (!snapshot.exists()) {
+          await set(userRef, {
+            email: user.email,
+            providerId: user.providerData[0].providerId,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+            createdAt: Date.now(),
+            lastLogin: Date.now(),
+          });
+        }
+
+        Cookies.set('uid', user.uid, { secure: true });
+        Cookies.set('isLoggedIn', 'true', { secure: true });
+
+        console.log('User ID:', user.uid);
+        console.log('Login Status:', true);
+
+        router.push(`../user/${user.uid}`);
+        console.log('Google login successful');
       }
-      router.push(`../user/${user.uid}`);
-
-      console.log("Google login successful");
-      setUserActive(true, user.uid);
-      
+    } catch (error) {
+      console.error('Google login failed:', error);
+      throw error;
     }
-  } catch (error) {
-    console.error("Google login failed:", error);
-  }
-};
+  };
 
-
-  // Function to handle form submission
   const handleSubmit = async () => {
-    // Validate form fields
     if (!email) {
-      setEmailError("Email is required");
+      setEmailError('Email is required');
       return;
     }
 
     if (!password) {
-      setPasswordError("Password is required");
+      setPasswordError('Password is required');
       return;
     }
 
     if (!termsChecked) {
-      setTermsError("You must agree to the Terms and Conditions");
+      setTermsError('You must agree to the Terms and Conditions');
       return;
     }
-    if(!name){
-      setNameError("Enter Your Name")
+
+    if (!name) {
+      setNameError('Enter Your Name');
     }
 
-    // Call the signIn function for user registration
     await signIn();
   };
 
@@ -250,6 +235,3 @@ const handleGoogleLogin = async () => {
     </>
   }
 
-function setUserActive(arg0: boolean, uid: string) {
-  throw new Error("Function not implemented.");
-}

@@ -11,12 +11,11 @@ import Carousel from './carousel';
 import Stat from './stats';
 import Footer  from './footer';
 import Link from 'next/link';
-import { UserStatusProvider } from './userStatus';
 
 
 export default function Home() {
   return (
-<UserStatusProvider>
+<>
     <div>
       <div>
       <Header item={undefined} />
@@ -38,6 +37,6 @@ export default function Home() {
           <Footer />
       </div>
     </div>
-  </UserStatusProvider>
+  </>
   )
 }
