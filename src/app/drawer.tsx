@@ -1,9 +1,10 @@
-// components/SideDrawer.js
-import React from 'react';
+// components/SideDrawer.ts
+'use client'
+import React,{useState} from 'react';
 import Drawer from '@mui/material/Drawer';
 import { Typography } from '@mui/material';
 import Link from 'next/link';
-
+import { useUserStatus } from './userStatus' // Adjust the path as needed
 
 const SideDrawer = ({
   isOpen,
@@ -12,6 +13,10 @@ const SideDrawer = ({
   isOpen: boolean;
   onClose: () => void;
 }) => {
+  const { userActive } = useUserStatus();
+
+  const accountLink = userActive ? './account' : './auth';
+
   return (
     <Drawer anchor="left" open={isOpen} onClose={onClose}>
       <div className="pt-6 flex flex-col">
@@ -19,7 +24,7 @@ const SideDrawer = ({
           variant="subtitle1"
           className="p-5 font-serif transition duration-150 ease-out hover:ease-in bg-[#B6BBC4] hover:bg-[#161A30]"
         >
-          <Link href="./account">Account</Link>
+          <Link href={accountLink}>Account</Link>
         </Typography>
         <Typography
           variant="subtitle1"

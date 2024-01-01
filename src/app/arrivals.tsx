@@ -1,6 +1,6 @@
 // Arrivals.js
 'use client'
-import { get, ref, onValue } from 'firebase/database';
+import { get, ref, onValue, off } from 'firebase/database';
 import React, { useState, useEffect } from 'react';
 import { Typography, Box, Button, IconButton } from '@mui/material';
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
@@ -8,13 +8,14 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import Cart from './cart'; // Make sure to import the correct path
 import Link from 'next/link';
 import { database } from "./firebase";
+import ProductPage from './product/[id]/page';
 
 const Arrivals = ({ onAddToCart }: { onAddToCart: (product: any) => void }) => {
-
-  const [items, setItems] = useState([]);
+const [items, setItems] = useState<Item[]>([]);
   const [selectedHeader, setSelectedHeader] = useState('All');
   const [showCart, setShowCart] = useState(false);
-   interface Item {
+  interface Item {
+     id:number,
   Category: string;
   availability: boolean;
   average_rating: number;
@@ -27,23 +28,24 @@ const Arrivals = ({ onAddToCart }: { onAddToCart: (product: any) => void }) => {
   // Add other properties if needed
 }
 
- useEffect(() => {
+useEffect(() => {
   const itemsRef = ref(database, 'items');
 
-  try {
-    onValue(itemsRef, (snapshot) => {
-      if (snapshot.exists()) {
-        const itemsData: Item[] = Object.values(snapshot.val());
-        setItems(itemsData);
-      } else {
-        setItems([]);
-      }
-    });
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  }
+  const itemsListener = onValue(itemsRef, (snapshot) => {
+    if (snapshot.exists()) {
+      const itemsData: Item[] = Object.entries(snapshot.val()).map(([id, data]) => ({ id: parseInt(id), ... data  }));
+      setItems(itemsData);
+    } else {
+      setItems([]);
+    }
+  });
+
+  return () => {
+    off(itemsRef, 'value', itemsListener); // Unsubscribe from the database listener
+
+  };
 }, []);
- 
+
   const handleHeaderChange = (header: string) => {
     setSelectedHeader(header);
   };
@@ -56,16 +58,18 @@ const Arrivals = ({ onAddToCart }: { onAddToCart: (product: any) => void }) => {
     localStorage.setItem('cartItems', JSON.stringify([...JSON.parse(localStorage.getItem('cartItems') || '[]'), item]));
   };
 
-  return (
-    <div className="lg:w-1/4 md:w-1/2 p-4 w-full">
-      <a className="block relative h-48 rounded overflow-hidden">
+    return (
+      <div className="lg:w-1/4 md:w-1/2 p-4 w-full">
+    <Link href={`/product/${item.id}`} prefetch>
+      
+      <div className="block relative h-48 rounded overflow-hidden">
         <img 
           src={item.images}
           alt="Your Image Alt Text"
           width={1920}
           height={1080}
         />
-      </a>
+      </div>
 
       <div className="mt-4">
         <h3 className="text-gray-500 text-xs tracking-widest title-font mb-1">
@@ -85,8 +89,10 @@ const Arrivals = ({ onAddToCart }: { onAddToCart: (product: any) => void }) => {
         >
           <ShoppingCartIcon />
         </IconButton>
-      </div>
-    </div>
+          </div>
+        </Link>
+        </div>
+  
 );
   };
 
@@ -142,7 +148,7 @@ const Arrivals = ({ onAddToCart }: { onAddToCart: (product: any) => void }) => {
       <div>
         {items &&
           filterItemsByCategory().map((item: any) => (
-            <ArrivalItem key={item.id} item={item} />
+            <ArrivalItem key={item.index} item={item} />
           ))}
         {!items && <p>Loading...</p>}
         {items && filterItemsByCategory().length === 0 && (

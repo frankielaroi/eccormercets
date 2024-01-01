@@ -9,6 +9,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import Cart from './cart';
 import Arrivals from './arrivals';
+import { UserStatusProvider } from './userStatus';
 
 const Header = ({ item }: { item: any }) => {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
@@ -28,6 +29,7 @@ const Header = ({ item }: { item: any }) => {
     setCartOpen(false);
   };
   return (
+    <UserStatusProvider>
     <div className="flex flex-row justify-between bg-[#E5E8ED] pt-3">
       <Button onClick={handleDrawerOpen}>
         <Menu sx={{ width: 40, height: 40, color: "darkblue" }}></Menu>
@@ -56,7 +58,8 @@ const Header = ({ item }: { item: any }) => {
           <Cart isOpen={isCartopen} onClose={handleCartClose}></Cart>
         </Badge>
       </div>
-    </div>
+      </div>
+    </UserStatusProvider>
   );
 };
 

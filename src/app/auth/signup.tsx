@@ -5,24 +5,31 @@ import { GoogleAuthProvider, FacebookAuthProvider, signInWithPopup, getAuth, Git
 import { auth, database } from "../firebase";
 import { getDatabase, ref, set, get } from "firebase/database";
 import { Apple, Facebook, Google } from "@mui/icons-material";
+import { useRouter } from "next/navigation";
+import Account from "../user/[uid]/page";
 
 export default function Signup() {
   // State for form input values
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [termsChecked, setTermsChecked] = useState(false);
+  const [name, setName] = useState("");
 
   // Validation errors
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [termsError, setTermsError] = useState("");
-
+  const [nameError,setNameError]=useState("")
+   const router = useRouter();
   // Function to handle email input change
   const handleEmailChange = (e: { target: { value: React.SetStateAction<string> } }) => {
     setEmail(e.target.value);
     setEmailError(""); // Reset error when user types
   };
-
+  const handleNameChange = (e: { target: { value: React.SetStateAction<string> } }) => {
+    setName(e.target.value);
+    setNameError("");
+}
   // Function to handle password input change
   const handlePasswordChange = (e: { target: { value: React.SetStateAction<string> } }) => {
     setPassword(e.target.value);
@@ -30,40 +37,63 @@ export default function Signup() {
   };
 
   // Function to handle terms checkbox change
-  const handleTermsChange = (e: { target: { checked: boolean | ((prevState: boolean) => boolean) } }) => {
-    setTermsChecked(e.target.checked);
-    setTermsError(""); // Reset error when user checks/unchecks
-  };
+  const handleTermsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  setTermsChecked(e.target.checked);
+  setTermsError(""); // Reset error when user checks/unchecks
+};
 
-  // Function to handle user sign up
-  const signIn = async () => {
-    try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      );
 
-      // Send verification email
-      const user = userCredential.user;
-      await sendEmailVerification(user);
+ const signIn = async () => {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
 
-      // Create a user in the database with UID
-      await set(ref(database, `users/${user.uid}`), {
-        email: user.email,
-        providerId: user.providerData[0].providerId,
-        displayName: user.displayName,
-        photoURL: user.photoURL,
-        createdAt: Date.now(),
-        lastLogin:Date.now()
-        // Add other user details if needed
-      });
+    // Send verification email
+    const user = userCredential.user;
+    await sendEmailVerification(user);
 
-      alert("Verification email sent");
-    } catch (err) {
+    // Check if the user already exists in the database
+    const userRef = ref(database, `users/${user.uid}`);
+    const snapshot = await get(userRef);
+
+    if (snapshot.exists()) {
+      // User already exists
+      console.log("User already exists");
+      // You can set an error state here and display a message to the user
+      return;
+    }
+
+    // Create a user in the database with UID
+    await set(userRef, {
+      email: user.email,
+      providerId: user.providerData[0].providerId,
+      displayName: user.displayName,
+      photoURL: user.photoURL,
+      createdAt: Date.now(),
+      lastLogin: Date.now(),
+      // Add other user details if needed
+    });
+
+    alert("Verification email sent");
+     setUserActive(true, user.uid);
+
+    // Redirect the user to the sign-in page after successful registration
+    // You can use a library like react-router-dom for navigation
+    // Example: history.push("/sign-in");
+  } catch (err:any) {
+    // Check for specific error codes
+    if (err.code === "auth/email-already-in-use") {
+      console.error("Email already in use:", err.message);
+      // Set an error state and display a message to the user
+    } else {
       console.error(err);
     }
-  };
+  }
+};
+
 
   // Function to handle GitHub login
   const handleGitHubLogin = async () => {
@@ -92,44 +122,48 @@ export default function Signup() {
 
         console.log("GitHub login successful");
         // Additional logic if needed
+        const setUserActive = (isActive: boolean, userId: string) => {
+setUserActive(true, user.uid);
+        }; 
+
       }
     } catch (error) {
       console.error("GitHub login failed:", error);
     }
   };
 
-  // Function to handle Google login
- const handleGoogleLogin = async () => {
+// Function to handle Google login
+const handleGoogleLogin = async () => {
   try {
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
 
     if (user) {
-      // Check if the user already exists in the database
       const userRef = ref(database, `users/${user.uid}`);
       const snapshot = await get(userRef);
 
       if (!snapshot.exists()) {
-        // Create a user in the database with Google UID
         await set(userRef, {
-        email: user.email,
-        providerId: user.providerData[0].providerId,
-        displayName: user.displayName,
-        photoURL: user.photoURL,
-        createdAt: Date.now(),
-        lastLogin:Date.now()
-          // Add other user details if needed
+          email: user.email,
+          providerId: user.providerData[0].providerId,
+          displayName: user.displayName,
+          photoURL: user.photoURL,
+          createdAt: Date.now(),
+          lastLogin: Date.now(),
         });
       }
+      router.push(`../user/${user.uid}`);
 
       console.log("Google login successful");
-      // Additional logic or redirect if needed
+      setUserActive(true, user.uid);
+      
     }
   } catch (error) {
     console.error("Google login failed:", error);
   }
 };
+
 
   // Function to handle form submission
   const handleSubmit = async () => {
@@ -147,6 +181,9 @@ export default function Signup() {
     if (!termsChecked) {
       setTermsError("You must agree to the Terms and Conditions");
       return;
+    }
+    if(!name){
+      setNameError("Enter Your Name")
     }
 
     // Call the signIn function for user registration
@@ -182,6 +219,7 @@ export default function Signup() {
           <div className="flex-auto p-6">
             <form role="form text-left">
               <div className="mb-4">
+                <input onChange={handleNameChange} aria-aria-describedby="name-addon"aria-label="Full name" placeholder="Full name"className="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" type="text" value={name}></input>
               </div>
               <div className="mb-4">
                 <input aria-describedby="email-addon" aria-label="Email" placeholder="Email" className="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" type="email" value={email}
@@ -190,10 +228,9 @@ export default function Signup() {
               <div className="mb-4">
                 <input aria-describedby="password-addon" aria-label="Password" placeholder="Password" className="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" type="password" value={password}
                   onChange={handlePasswordChange} />{passwordError && <p className="text-red-500">{passwordError}</p>}
-
               </div>
               <div className="min-h-6 pl-7 mb-0.5 block">
-                <input value='' checked={termsChecked} type="checkbox" className="w-5 h-5 ease-soft -ml-7 rounded-1.4 checked:bg-gradient-to-tl checked:from-gray-900 checked:to-slate-800 after:duration-250 after:ease-soft-in-out duration-250 relative float-left mt-1 cursor-pointer appearance-none border border-solid border-slate-200 bg-white bg-contain bg-center bg-no-repeat align-top transition-all after:absolute after:flex after:h-full after:w-full after:items-center after:justify-center after:text-white after:opacity-0 after:transition-all checked:border-0 checked:border-transparent checked:bg-transparent checked:after:opacity-100" id="terms" />
+                <input onChange={handleTermsChange} value='' checked={termsChecked} type="checkbox" className="w-5 h-5 ease-soft -ml-7 rounded-1.4 checked:bg-gradient-to-tl checked:from-gray-900 checked:to-slate-800 after:duration-250 after:ease-soft-in-out duration-250 relative float-left mt-1 cursor-pointer appearance-none border border-solid border-slate-200 bg-white bg-contain bg-center bg-no-repeat align-top transition-all after:absolute after:flex after:h-full after:w-full after:items-center after:justify-center after:text-white after:opacity-0 after:transition-all checked:border-0 checked:border-transparent checked:bg-transparent checked:after:opacity-100" id="terms" />
                 <label htmlFor="terms" className="mb-2 ml-1 font-normal cursor-pointer select-none text-sm text-slate-700"> I agree the <a className="font-bold text-slate-700">Terms and Conditions</a>
                   <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 inline ml-1 fill-current text-green-500">
                     <path d="M6.293 9.293a1 1 0 0 1 1.414 0L10 10.586l2.293-2.293a1 1 0 1 1 1.414 1.414l-3 3a1 1 0 0 1-1.414 0l-3-3a1 1 0 0 1 0-1.414z"></path>
@@ -212,3 +249,7 @@ export default function Signup() {
       </div>
     </>
   }
+
+function setUserActive(arg0: boolean, uid: string) {
+  throw new Error("Function not implemented.");
+}
