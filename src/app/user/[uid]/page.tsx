@@ -5,7 +5,7 @@ import Footer from '../../footer'
 import { useParams } from 'next/navigation';
 import { database } from '../../firebase';
 import { get, ref } from 'firebase/database';
-import { Avatar } from '@mui/material';
+import { Avatar, Button, Typography } from '@mui/material';
 interface User {
     uid: string;
     email: string,
@@ -17,7 +17,8 @@ interface User {
 }
 export default function Account() {
     const { uid } = useParams();
-  const [user,setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<User | null>(null);
+    
 
     useEffect(() => {
         const getItem = async () => {
@@ -34,15 +35,32 @@ export default function Account() {
                     console.log('Error getting item:', error);
                 }
             }
-        }
-    });
+        }; 
+        getItem()
+    }, [uid]);
     return (
-        <div className='bg-[#00000065]'>
+        <div className='flex place-content-evenly flex-col'>
             <Header item={undefined} /> 
-            <Avatar src={user?.photoURL} sx={{
+            <div className='flex place-content-center'>
+           <div className='flex flex-col'> <Avatar src={user?.photoURL} sx={{
                 display: 'flex',
-                placeContent:'center'
+                placeContent: 'center',
+                justifyContent: 'center',
+                width: 200,
+                height:200,
             }} />
+                <div>
+                        <Typography sx={{
+                            fontStyle: 'italic',
+                            fontFamily:'monospace'
+                        }} variant='h3'>{user?.displayName}</Typography>
+                        <Button sx={{
+                            fontStyle: 'italic',
+                            fontFamily:'monospace'
+                    }} variant='outlined'>{user?.email}</Button>
+                </div>
+                </div>
+            </div>
             <Footer />
         </div>
     )

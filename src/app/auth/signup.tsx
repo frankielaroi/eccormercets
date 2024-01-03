@@ -1,7 +1,7 @@
 'use client';
 import Cookies from 'js-cookie';
 import React, { useState } from 'react';
-import { GoogleAuthProvider, FacebookAuthProvider, signInWithPopup, getAuth, GithubAuthProvider, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import { GoogleAuthProvider, FacebookAuthProvider, signInWithPopup, getAuth, GithubAuthProvider, createUserWithEmailAndPassword, sendEmailVerification, User } from 'firebase/auth';
 import { auth, database } from '../firebase';
 import { getDatabase, ref, set, get } from 'firebase/database';
 import { Apple, Facebook, Google } from '@mui/icons-material';
@@ -58,7 +58,7 @@ export default function Signup() {
       await set(userRef, {
         email: user.email,
         providerId: user.providerData[0].providerId,
-        displayName: user.displayName,
+        displayName: name,
         photoURL: user.photoURL,
         createdAt: Date.now(),
         lastLogin: Date.now(),
@@ -80,7 +80,21 @@ export default function Signup() {
       }
     }
   };
+const setUserIfNotExists = async (user: User) => {
+  const userRef = ref(database, `users/${user.uid}`);
+  const snapshot = await get(userRef);
 
+  if (!snapshot.exists()) {
+    await set(userRef, {
+      email: user.email,
+      providerId: user.providerData[0].providerId,
+      displayName: user.displayName,
+      photoURL: user.photoURL,
+      createdAt: Date.now(),
+      lastLogin: Date.now(),
+    });
+  }
+};
   const handleGitHubLogin = async () => {
     try {
       const provider = new GithubAuthProvider();
@@ -88,54 +102,32 @@ export default function Signup() {
       const user = result.user;
 
       if (user) {
-        const userRef = ref(database, `users/${user.uid}`);
-        const snapshot = await get(userRef);
+        await setUserIfNotExists(user);
+         
+      };
 
-        if (!snapshot.exists()) {
-          await set(userRef, {
-            email: user.email,
-            providerId: user.providerData[0].providerId,
-            displayName: user.displayName,
-            photoURL: user.photoURL,
-            createdAt: Date.now(),
-            lastLogin: Date.now(),
-          });
-        }
+      console.log('GitHub login successful');
+      Cookies.set('uid', user.uid, { secure: true, httpOnly: true });
+      Cookies.set('isLoggedIn', 'true', { secure: true, httpOnly: true });
 
-        console.log('GitHub login successful');
-        Cookies.set('uid', user.uid, { secure: true, httpOnly: true });
-        Cookies.set('isLoggedIn', 'true', { secure: true, httpOnly: true });
+      console.log('User ID:', user.uid);
+      console.log('Login Status:', true);
 
-        console.log('User ID:', user.uid);
-        console.log('Login Status:', true);
-
-        router.push(`../user/${user.uid}`);
-      }
-    } catch (error) {
+      router.push(`../user/${user.uid}`);
+    }
+    catch (error) {
       console.error('GitHub login failed:', error);
     }
   };
 
-  const handleGoogleLogin = async () => {
-    try {
+ const handleGoogleLogin = async () => {
+  try {
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
 
-      if (user) {
-        const userRef = ref(database, `users/${user.uid}`);
-        const snapshot = await get(userRef);
-
-        if (!snapshot.exists()) {
-          await set(userRef, {
-            email: user.email,
-            providerId: user.providerData[0].providerId,
-            displayName: user.displayName,
-            photoURL: user.photoURL,
-            createdAt: Date.now(),
-            lastLogin: Date.now(),
-          });
-        }
+    if (user) {
+      await setUserIfNotExists(user);
 
         Cookies.set('uid', user.uid, { secure: true });
         Cookies.set('isLoggedIn', 'true', { secure: true });

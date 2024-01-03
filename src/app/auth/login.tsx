@@ -1,13 +1,10 @@
 'use client';
-import { Apple, GitHub, Google } from "@mui/icons-material";
+import { Apple, Google } from "@mui/icons-material";
 import { Button, TextField } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import {
   GoogleAuthProvider,
-  FacebookAuthProvider,
   signInWithPopup,
-  getAuth,
-  GithubAuthProvider,
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { set, ref, getDatabase } from "firebase/database";
