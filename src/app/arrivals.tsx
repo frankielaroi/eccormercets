@@ -6,6 +6,7 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import Cart from './cart'; // Make sure to import the correct path
 import Link from 'next/link';
+import Image   from "next/image";
 import { database } from "./firebase";
 import ProductPage from './product/[id]/page';
 
@@ -33,7 +34,11 @@ const Arrivals = ({ onAddToCart }: { onAddToCart: (product: any) => void }) => {
 
     const itemsListener = onValue(itemsRef, (snapshot) => {
       if (snapshot.exists()) {
-     const itemsData: Item[] = Object.entries(snapshot.val()).map(([id, data]) => ({ id: parseInt(id), ...data }));
+const itemsData: Item[] = Object.entries(snapshot.val()).map(([id, data]: [string, any]) => ({
+  id: parseInt(id),
+  ...data
+}));
+
         setItems(itemsData);
       } else {
         setItems([]);
@@ -49,8 +54,8 @@ const Arrivals = ({ onAddToCart }: { onAddToCart: (product: any) => void }) => {
     setSelectedHeader(header);
   };
 
-  const ArrivalItem = ({ item }: { item: any }) => {
-    const handleAddToCart = (item: any) => {
+  const ArrivalItem = ({ item }: { item: Item }) => {
+    const handleAddToCart = (item:Item) => {
       // Save item to local storage
       localStorage.setItem('cartItems', JSON.stringify([...JSON.parse(localStorage.getItem('cartItems') || '[]'), item]));
     };
@@ -59,7 +64,7 @@ const Arrivals = ({ onAddToCart }: { onAddToCart: (product: any) => void }) => {
       <div className="lg:w-1/4 md:w-1/2 p-4 w-full">
         <div className="block relative h-48 rounded overflow-hidden">
           <Link href={`/product/${item.id}`} prefetch>
-            <img 
+            <Image 
               src={item.images}
               alt="Your Image Alt Text"
               width={1920}

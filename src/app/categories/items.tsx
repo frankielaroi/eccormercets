@@ -11,7 +11,7 @@ export default function Item() {
 const [items, setItems] = useState<Item[]>([]);
 
   // Item interface...
-   interface Item {
+  type Item = {
   id: number;
   Category: string;
   availability: boolean;
@@ -30,7 +30,10 @@ const [items, setItems] = useState<Item[]>([]);
 
   const itemsListener = onValue(itemsRef, (snapshot) => {
     if (snapshot.exists()) {
-      const itemsData: Item[] = Object.entries(snapshot.val()).map(([id, data]) => ({ id: parseInt(id), ...data }));
+const itemsData: Item[] = Object.entries(snapshot.val()).map(([id, data]: [string, any]) => ({
+  id: parseInt(id),
+  ...data
+}));
       setItems(itemsData);
     } else {
       setItems([]);
