@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import { UserStatusProvider } from './userStatus';
 import { Inter } from 'next/font/google'
 import './globals.css'
 
