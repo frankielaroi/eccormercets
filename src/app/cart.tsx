@@ -1,10 +1,12 @@
+'use client'
 import React, { useEffect, useState } from "react";
 import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Clear,ShoppingCart, ShoppingCartCheckout } from "@mui/icons-material";
 import { Button, Typography } from "@mui/material";
-import { relative } from "path";
+import { useRouter } from "next/navigation";
+import Cookies from 'js-cookie'
 
 const Cart = ({
   isOpen,
@@ -12,7 +14,8 @@ const Cart = ({
 }: {
   isOpen: boolean;
   onClose: () => void;
-}) => {
+  }) => {
+  const router = useRouter();
   interface CartItem {
     index: number;
     id: string;
@@ -47,7 +50,12 @@ const Cart = ({
 
   // Save the updated items back to local storage
   localStorage.setItem('cartItems', JSON.stringify(updatedCartItems));
-};
+  };
+  const handleCheckout = () => {
+      localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    // Navigate to the checkout page
+    router.push('/checkout');
+  };
 
   return (
     <Drawer anchor="right" open={isOpen} onClose={onClose} sx={{
@@ -85,7 +93,7 @@ const Cart = ({
           height: 30,
           marginTop: 5,
         }}
-startIcon={<ShoppingCartCheckout />}>CHECKOUT</Button>      </div>
+startIcon={<ShoppingCartCheckout />} onClick={handleCheckout} >CHECKOUT</Button>      </div>
     </Drawer>
   );
 };

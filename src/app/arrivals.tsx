@@ -14,7 +14,7 @@ const Arrivals = ({ onAddToCart }: { onAddToCart: (product: any) => void }) => {
 const [items, setItems] = useState<Item[]>([]);
   const [selectedHeader, setSelectedHeader] = useState('All');
   const [showCart, setShowCart] = useState(false);
-  interface Item {
+  type Item = {
      id:number,
   Category: string;
   availability: boolean;
@@ -33,7 +33,7 @@ useEffect(() => {
 
   const itemsListener = onValue(itemsRef, (snapshot) => {
     if (snapshot.exists()) {
-      const itemsData: Item[] = Object.entries(snapshot.val()).map(([id, data]) => ({ id: parseInt(id), ... data  }));
+const itemsData: Item[] = Object.entries(snapshot.val()).map(([id, data]) => ({ id: parseInt(id), ...(typeof data === 'object' ? data : {}) }));
       setItems(itemsData);
     } else {
       setItems([]);
@@ -45,6 +45,7 @@ useEffect(() => {
 
   };
 }, []);
+  
 
   const handleHeaderChange = (header: string) => {
     setSelectedHeader(header);

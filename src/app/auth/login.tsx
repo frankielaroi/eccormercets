@@ -1,14 +1,16 @@
 'use client';
-import { Apple, Google } from "@mui/icons-material";
-import { Button, TextField } from "@mui/material";
+import Cookies from "js-cookie";
+import { Apple, GitHub, Google } from "@mui/icons-material";
+import { Button, IconButton, TextField } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import {
   GoogleAuthProvider,
   signInWithPopup,
   signInWithEmailAndPassword,
+  GithubAuthProvider
 } from "firebase/auth";
-import { set, ref, getDatabase } from "firebase/database";
-import { auth } from "../firebase";
+import { set, ref, getDatabase,get} from "firebase/database";
+import { auth, database } from "../firebase";
 import { useRouter } from "next/navigation";
 
 const db = getDatabase();
@@ -25,47 +27,81 @@ export default function Login() {
     try {
       const provider = new GoogleAuthProvider();
       const { user } = await signInWithPopup(auth, provider);
+      const userRef = ref(database, `users/${user.uid}`);
+
+      const snapshot = await get(userRef);
+
+
+        
+    if (!snapshot.exists()) {
+      console.log("User account not found");
+      alert("No User Account Found!");
+      return;
+    }
 
       // Store user data in Realtime Database
-      await set(ref(db, `users/${user.uid}`), {
-        email: user.email,
-        // Add other user data as needed
-      });
+      
 
       console.log("Google login successful");
       router.push(`/user/${user.uid}`);
+       Cookies.set('uid', user.uid, { secure: true, });
+      Cookies.set('isLoggedIn', 'true', { secure: true, });
     } catch (error) {
       console.error("Google login failed:", error);
     }
   };
-
-  const signInWithEmailPassword = async () => {
+const handleGithubLogin = async () => {
     try {
-      const result = await signInWithEmailAndPassword(auth, email, password);
-      const user = result.user;
+      const provider = new GithubAuthProvider();
+      const { user } = await signInWithPopup(auth, provider);
 
-      if (!email) {
-        setEmailError("Email is required");
-        return;
-      }
+     const userRef = ref(database, `users/${user.uid}`);
 
-      if (!password) {
-        setPasswordError("Password is required");
-        return;
-      }
+      const snapshot = await get(userRef);
 
-      // Store user data in Realtime Database
-      await set(ref(db, `users/${user.uid}`), {
-        email: user.email,
-        // Add other user data as needed
-      });
 
-      console.log("User signed in:", user);
+        
+    if (!snapshot.exists()) {
+      console.log("User account not found");
+      alert("No User Account Found!");
+      return;
+    }
+
+      console.log("Github login successful");
       router.push(`/user/${user.uid}`);
+       Cookies.set('uid', user.uid, { secure: true, });
+      Cookies.set('isLoggedIn', 'true', { secure: true, });
     } catch (error) {
-      console.error("Sign-in error:", error);
+      console.error("Github login failed:", error);
     }
   };
+
+  const signInWithEmailPassword = async () => {
+  try {
+    if (!email || !password) {
+      setEmailError("Email and password are required");
+      return;
+    }
+ const result = await signInWithEmailAndPassword(auth, email, password);
+    const user = result.user;
+    const userRef = ref(database, `users/${user.uid}`);
+    const snapshot = await get(userRef);
+
+    if (!snapshot.exists()) {
+      console.log("User account not found");
+      alert("No User Account Found!");
+      return;
+    }
+
+   
+
+    console.log("User signed in:", user);
+    router.push(`/user/${user.uid}`);
+  } catch (error) {
+    console.error("Sign-in error:", error);
+  }
+};
+
 
   const handleEmailChange = (e: { target: { value: React.SetStateAction<string>; }; }) => {
     setEmail(e.target.value);
@@ -77,65 +113,65 @@ export default function Login() {
     setPasswordError(""); // Reset error when the user types
   };
 
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.location) {
-      router.push("../");
-    }
-  }, []);
-
+  
   return (
-    <div className="flex flex-col place-content-center py-40">
-      <div className="flex flex-col place-items-center p-10">
-        <div className="flex justify-center">
-          <Button startIcon={<Google />} onClick={handleGoogleLogin} />
-          <Button startIcon={<Apple />} />
-        </div>
-
-        <div className="flex flex-col place-items-center p-10">
-          <TextField
-            label="Email"
-            fullWidth={true}
-            sx={{
-              maxWidth: 700,
-              margin: "auto",
-            }}
-            value={email}
-            onChange={handleEmailChange}
-            error={!!emailError}
-            helperText={emailError}
-          />
-        </div>
-
-        <div className="flex flex-col place-items-center">
-          <TextField
-            label="Password"
-            fullWidth={true}
-            sx={{
-              maxWidth: 500,
-              margin: " auto",
-            }}
-            type="password"
-            value={password}
-            onChange={handlePasswordChange}
-            error={!!passwordError}
-            helperText={passwordError}
-          />
-        </div>
-
-        <div className="flex flex-col place-items-center">
-          <Button
-            onClick={signInWithEmailPassword}
-            variant="contained"
-            color="primary"
-            size="large"
-            sx={{
-              marginTop: 3,
-            }}
+    
+    <div className="h-screen w-full">
+      <div className="h-full w-full flex items-center justify-center">
+        <div className="h-full w-full">
+          <div
+            className="flex flex-col hover:blur-0 h-full bg-center bg-cover items-center justify-center w-full gap-5 bg-inherit"
           >
-            Login
-          </Button>
+            <ul className="inline-flex items-center text-xl gap-10">
+              <li>
+                <IconButton onClick={handleGoogleLogin}>
+                  <Google />
+                </IconButton>
+              </li>
+              <li>
+                <IconButton onClick={handleGithubLogin}>
+                  <GitHub />
+                </IconButton>
+              </li>
+            </ul>
+            <p className="text-inherit text-right">or use email your account</p>
+            <input
+              type="email"
+              name=""
+              id=""
+              className="bg-white/50 hover:bg-white md:bg-white placeholder:text-violet-500 placeholder:text-sm text-violet-500 py-3 px-5 focus:text-violet-500 focus:outline focus:outline-offset-1 focus:outline-violet-500 rounded-md"
+              placeholder="Enter Your Email Here!"
+              value={email}
+              onChange={handleEmailChange}
+            />
+            <input
+              type="password"
+              name=""
+              id=""
+              className="w-200 bg-white/50 hover:bg-white md:bg-white placeholder:text-violet-500 placeholder:text-sm text-violet-500 py-3 px-5 focus:text-violet-500 focus:outline focus:outline-offset-1 focus:outline-violet-500 rounded-md"
+              placeholder="Enter Your Password Here!"
+              value={password}
+              onChange={handlePasswordChange}
+            />
+            <div className="text-right">
+              <a
+                href=""
+                className="italic text-inherit text-sm underline decoration-violet-500 text-violet-500 hover:text-violet-700 transition"
+              >Forget your Password?
+              </a>
+            </div>
+            <button
+              onClick={signInWithEmailPassword} className="px-6 py-2 bg-violet-500 rounded hover:bg-white hover:text-violet-700 font-semibold transition-all text-white hover:scale-110"
+            >
+              Submit
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
 }
+function showErrorMessage(arg0: string) {
+  throw new Error("Function not implemented.");
+}
+

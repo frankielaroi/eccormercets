@@ -1,7 +1,7 @@
 'use client';
 import Cookies from 'js-cookie';
 import React, { useState } from 'react';
-import { GoogleAuthProvider, FacebookAuthProvider, signInWithPopup, getAuth, GithubAuthProvider, createUserWithEmailAndPassword, sendEmailVerification, User } from 'firebase/auth';
+import { GoogleAuthProvider, FacebookAuthProvider, signInWithPopup, getAuth, GithubAuthProvider, createUserWithEmailAndPassword, sendEmailVerification, User, UserCredential } from 'firebase/auth';
 import { auth, database } from '../firebase';
 import { getDatabase, ref, set, get } from 'firebase/database';
 import { Apple, Facebook, Google } from '@mui/icons-material';
@@ -41,45 +41,44 @@ export default function Signup() {
     setTermsError('');
   };
 
-  const signIn = async () => {
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      await sendEmailVerification(user);
+const signIn = async () => {
+  try {
+    const { user } = await createUserWithEmailAndPassword(auth, email, password);
+    await sendEmailVerification(user);
 
-      const userRef = ref(database, `users/${user.uid}`);
-      const snapshot = await get(userRef);
+    const userRef = ref(database, `users/${user.uid}`);
+    const snapshot = await get(userRef);
 
-      if (snapshot.exists()) {
-        console.log('User already exists');
-        return;
-      }
-
-      await set(userRef, {
-        email: user.email,
-        providerId: user.providerData[0].providerId,
-        displayName: name,
-        photoURL: user.photoURL,
-        createdAt: Date.now(),
-        lastLogin: Date.now(),
-      });
-
-      console.log('Verification email sent');
-      Cookies.set('uid', user.uid, { secure: true, httpOnly: true });
-      Cookies.set('isLoggedIn', 'true', { secure: true, httpOnly: true });
-
-      console.log('User ID:', user.uid);
-      console.log('Login Status:', true);
-
-      router.push(`../user/${user.uid}`);
-    } catch (err:any) {
-      if (err.code === 'auth/email-already-in-use') {
-        console.error('Email already in use:', err.message);
-      } else {
-        console.error(err);
-      }
+    if (snapshot.exists()) {
+      return console.log('User already exists');
     }
-  };
+
+    await set(userRef, {
+      email: user.email,
+      providerId: user.providerData[0].providerId,
+      displayName: name,
+      photoURL: user.photoURL,
+      createdAt: Date.now(),
+      lastLogin: Date.now(),
+    });
+
+    console.log('Verification email sent');
+    Cookies.set('uid', user.uid, { secure: true, expires: 1 });
+    Cookies.set('isLoggedIn', 'true', { secure: true, expires: 1 });
+
+    console.log('User ID:', user.uid);
+    console.log('Login Status:', true);
+
+    router.push(`../user/${user.uid}`);
+  } catch (err:any) {
+    if (err.code === 'auth/email-already-in-use') {
+      console.error('Email already in use:', err.message);
+    } else {
+      console.error(err);
+    }
+  }
+};
+
 const setUserIfNotExists = async (user: User) => {
   const userRef = ref(database, `users/${user.uid}`);
   const snapshot = await get(userRef);
@@ -95,54 +94,64 @@ const setUserIfNotExists = async (user: User) => {
     });
   }
 };
-  const handleGitHubLogin = async () => {
-    try {
-      const provider = new GithubAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
+  const handleGoogleLogin = async () => {
+  try {
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+    
+    // Add this line to explicitly specify the type of result
+    const userCredential: UserCredential = result as UserCredential;
 
-      if (user) {
-        await setUserIfNotExists(user);
-         
-      };
+    const user = userCredential.user;
 
-      console.log('GitHub login successful');
-      Cookies.set('uid', user.uid, { secure: true, httpOnly: true });
-      Cookies.set('isLoggedIn', 'true', { secure: true, httpOnly: true });
+    if (user) {
+      await setUserIfNotExists(user);
+
+      console.log('Google login successful');
+      Cookies.set('uid', user.uid, { secure: true, });
+      Cookies.set('isLoggedIn', 'true', { secure: true, });
 
       console.log('User ID:', user.uid);
       console.log('Login Status:', true);
 
       router.push(`../user/${user.uid}`);
+    } else {
+      console.error('Google login failed: User is undefined');
     }
-    catch (error) {
-      console.error('GitHub login failed:', error);
-    }
-  };
+  } catch (error) {
+    console.error('Google login failed:', error);
+  }
+};
 
- const handleGoogleLogin = async () => {
+
+  const handleGitHubLogin = async () => {
   try {
-    const provider = new GoogleAuthProvider();
+    const provider = new GithubAuthProvider();
     const result = await signInWithPopup(auth, provider);
-    const user = result.user;
+    
+    // Add this line to explicitly specify the type of result
+    const userCredential: UserCredential = result as UserCredential;
+
+    const user = userCredential.user;
 
     if (user) {
       await setUserIfNotExists(user);
 
-        Cookies.set('uid', user.uid, { secure: true });
-        Cookies.set('isLoggedIn', 'true', { secure: true });
+      console.log('GitHub login successful');
+      Cookies.set('uid', user.uid, { secure: true, });
+      Cookies.set('isLoggedIn', 'true', { secure: true, });
 
-        console.log('User ID:', user.uid);
-        console.log('Login Status:', true);
+      console.log('User ID:', user.uid);
+      console.log('Login Status:', true);
 
-        router.push(`../user/${user.uid}`);
-        console.log('Google login successful');
-      }
-    } catch (error) {
-      console.error('Google login failed:', error);
-      throw error;
+      router.push(`../user/${user.uid}`);
+    } else {
+      console.error('GitHub login failed: User is undefined');
     }
-  };
+  } catch (error) {
+    console.error('GitHub login failed:', error);
+  }
+};
 
   const handleSubmit = async () => {
     if (!email) {
@@ -169,8 +178,8 @@ const setUserIfNotExists = async (user: User) => {
 
     return <>
       <div className="w-full max-w-full px-3 mx-auto mt-0 md:flex-0 shrink-0">
-        <div className="relative z-0 flex flex-col min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
-          <div className="p-6 mb-0 text-center bg-white border-b-0 rounded-t-2xl">
+        <div className="relative z-0 flex flex-col min-w-0 break-words bg-inherit border-0 shadow-soft-xl rounded-2xl bg-clip-border">
+          <div className="p-6 mb-0 text-center bg-inherit border-b-0 rounded-t-2xl">
             <h5>Register with</h5>
           </div>
           <div className="flex flex-wrap px-3 -mx-3 sm:px-6 xl:px-12">

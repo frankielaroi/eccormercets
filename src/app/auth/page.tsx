@@ -1,8 +1,9 @@
-'use client'
-import React, { useState } from "react";
-import Login from "./login";
-import Signup from "./signup";
-import { Button } from "@mui/material";
+// Import necessary libraries and modules
+"use client"
+import React, { useState } from 'react';
+import Login from './login';
+import Signup from './signup';
+import { Button } from '@mui/material';
 
 export default function User() {
   const [selectedHeader, setSelectedHeader] = useState('Login');
@@ -10,20 +11,19 @@ export default function User() {
   const handleHeaderChange = (header: string) => {
     setSelectedHeader(header);
   };
-  
-  if (selectedHeader === "Login") {
-    return (
-      <>
-        <Heade />
-        <div  className="p-5">
-        <Signup /></div>
-      </>
-    );
-  }
-  
+
+  return (
+    <>
+      <Heade />
+      <div className="p-5">
+        {selectedHeader === 'Login' ? <Login /> : <Signup />}
+      </div>
+    </>
+  );
+
   function Heade() {
     return (
-      <div className="absolute">
+      <div className="flex place-content-center p-0">
         <Button color="inherit" onClick={() => handleHeaderChange('Login')}>
           Login
         </Button>
@@ -33,5 +33,4 @@ export default function User() {
       </div>
     );
   }
-  
 }
