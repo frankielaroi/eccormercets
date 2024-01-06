@@ -38,7 +38,7 @@ const [items, setItems] = useState<Item[]>([]);
   });
 
   return () => {
-    off(itemsRef, itemsListener); // Unsubscribe from the database listener
+    off(itemsRef, undefined); // Unsubscribe from the database listener
   };
 }, []);
 
@@ -57,15 +57,17 @@ const [items, setItems] = useState<Item[]>([]);
     };
 
     return (
-      <Link href={`../product/${item.id}`}> 
+     
      <div className="lg:w-1/4 md:w-1/2 p-4 w-full">
-      <a className="block relative h-48 rounded overflow-hidden">
+        <a className="block relative h-48 rounded overflow-hidden">
+          <Link href={`../product/${item.id}`}> 
         <img 
           src={item.images}
           alt="Your Image Alt Text"
           width={1920}
           height={1080}
-        />
+            />
+            </Link>
       </a>
 
       <div className="mt-4">
@@ -88,7 +90,7 @@ const [items, setItems] = useState<Item[]>([]);
         </IconButton>
       </div>
     </div>
-    </Link>
+    
     );
   };
 

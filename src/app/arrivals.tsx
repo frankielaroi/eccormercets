@@ -1,5 +1,4 @@
 // Arrivals.js
-'use client'
 import { get, ref, onValue, off } from 'firebase/database';
 import React, { useState, useEffect } from 'react';
 import { Typography, Box, Button, IconButton } from '@mui/material';
@@ -10,12 +9,8 @@ import Link from 'next/link';
 import { database } from "./firebase";
 import ProductPage from './product/[id]/page';
 
-const Arrivals = ({ onAddToCart }: { onAddToCart: (product: any) => void }) => {
-const [items, setItems] = useState<Item[]>([]);
-  const [selectedHeader, setSelectedHeader] = useState('All');
-  const [showCart, setShowCart] = useState(false);
-  type Item = {
-     id:number,
+type Item = {
+  id: number;
   Category: string;
   availability: boolean;
   average_rating: number;
@@ -28,73 +23,72 @@ const [items, setItems] = useState<Item[]>([]);
   // Add other properties if needed
 }
 
-useEffect(() => {
-  const itemsRef = ref(database, 'items');
+const Arrivals = ({ onAddToCart }: { onAddToCart: (product: any) => void }) => {
+  const [items, setItems] = useState<Item[]>([]);
+  const [selectedHeader, setSelectedHeader] = useState('All');
+  const [showCart, setShowCart] = useState(false);
 
-  const itemsListener = onValue(itemsRef, (snapshot) => {
-    if (snapshot.exists()) {
-const itemsData: Item[] = Object.entries(snapshot.val()).map(([id, data]) => ({ id: parseInt(id), ...(typeof data === 'object' ? data : {}) }));
-      setItems(itemsData);
-    } else {
-      setItems([]);
-    }
-  });
+  useEffect(() => {
+    const itemsRef = ref(database, 'items');
 
-  return () => {
-    off(itemsRef, 'value', itemsListener); // Unsubscribe from the database listener
+    const itemsListener = onValue(itemsRef, (snapshot) => {
+      if (snapshot.exists()) {
+     const itemsData: Item[] = Object.entries(snapshot.val()).map(([id, data]) => ({ id: parseInt(id), ...data }));
+        setItems(itemsData);
+      } else {
+        setItems([]);
+      }
+    });
 
-  };
-}, []);
-  
+    return () => {
+      off(itemsRef, 'value', itemsListener); // Unsubscribe from the database listener
+    };
+  }, []);
 
   const handleHeaderChange = (header: string) => {
     setSelectedHeader(header);
   };
 
-
-
   const ArrivalItem = ({ item }: { item: any }) => {
-  const handleAddToCart = (item: any) => {
-    // Save item to local storage
-    localStorage.setItem('cartItems', JSON.stringify([...JSON.parse(localStorage.getItem('cartItems') || '[]'), item]));
-  };
+    const handleAddToCart = (item: any) => {
+      // Save item to local storage
+      localStorage.setItem('cartItems', JSON.stringify([...JSON.parse(localStorage.getItem('cartItems') || '[]'), item]));
+    };
 
     return (
       <div className="lg:w-1/4 md:w-1/2 p-4 w-full">
-    <Link href={`/product/${item.id}`} prefetch>
-      
-      <div className="block relative h-48 rounded overflow-hidden">
-        <img 
-          src={item.images}
-          alt="Your Image Alt Text"
-          width={1920}
-          height={1080}
-        />
-      </div>
-
-      <div className="mt-4">
-        <h3 className="text-gray-500 text-xs tracking-widest title-font mb-1">
-          {item.Category}
-        </h3>
-
-        <h2 className="text-gray-900 title-font text-lg font-medium">
-          {item.name}
-        </h2>
-
-        <p className="mt-1">${item.selling_price}</p>
-
-        <IconButton
-          onClick={() => handleAddToCart(item)}
-          color="primary"
-          aria-label="Add to Cart"
-        >
-          <ShoppingCartIcon />
-        </IconButton>
-          </div>
-        </Link>
+        <div className="block relative h-48 rounded overflow-hidden">
+          <Link href={`/product/${item.id}`} prefetch>
+            <img 
+              src={item.images}
+              alt="Your Image Alt Text"
+              width={1920}
+              height={1080}
+            />
+          </Link>
         </div>
-  
-);
+      
+        <div className="mt-4">
+          <h3 className="text-gray-500 text-xs tracking-widest title-font mb-1">
+            {item.Category}
+          </h3>
+
+          <h2 className="text-gray-900 title-font text-lg font-medium">
+            {item.name}
+          </h2>
+
+          <p className="mt-1">${item.selling_price}</p>
+
+          <IconButton
+            onClick={() => handleAddToCart(item)}
+            color="primary"
+            aria-label="Add to Cart"
+          >
+            <ShoppingCartIcon />
+          </IconButton>
+        </div>
+      </div>
+    );
   };
 
   const filterItemsByCategory = () => {
@@ -174,10 +168,6 @@ const itemsData: Item[] = Object.entries(snapshot.val()).map(([id, data]) => ({ 
       </div>
     </div>
   );
-
 };
 
 export default Arrivals;
-
- 
- /* */
