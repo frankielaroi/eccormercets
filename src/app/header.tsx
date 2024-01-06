@@ -9,6 +9,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import Cart from './cart';
 import Arrivals from './arrivals';
+import Link from 'next/link'
 
 const Header = ({ item }: { item: any }) => {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
@@ -34,7 +35,9 @@ const Header = ({ item }: { item: any }) => {
       </Button>
       <SideDrawer isOpen={isDrawerOpen} onClose={handleDrawerClose} />
       <Typography variant="h4" className="font-serif pt-3">
-        Frankie
+        <Link href={'./'}>
+          Frankie
+        </Link>
       </Typography>
       <div className="pt-3">
         <SearchIcon
