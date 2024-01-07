@@ -1,7 +1,7 @@
 import React from 'react';
 
 export default function Stat() {
-    return <section className="text-gray-600 body-font">
+    return <section className="text-gray-600 body-font bg-white">
   <div className="container px-5 py-24 mx-auto">
     <div className="flex flex-wrap -m-4 text-center">
       <div className="p-4 sm:w-1/4 w-1/2">

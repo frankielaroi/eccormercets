@@ -61,7 +61,7 @@ const itemsData: Item[] = Object.entries(snapshot.val()).map(([id, data]: [strin
     };
 
     return (
-      <div className="lg:w-1/4 md:w-1/2 p-4 w-full">
+      <div className="lg:w-1/4 md:w-1/2 p-4 w-full bg-white">
         <div className="block relative h-48 rounded overflow-hidden">
           <Link href={`/product/${item.id}`} prefetch>
             <Image 
@@ -116,7 +116,7 @@ const itemsData: Item[] = Object.entries(snapshot.val()).map(([id, data]: [strin
   };
 
   return (
-    <div>
+    <div className='bg-white'>
       <Typography
         variant="h3"
         sx={{ fontFamily: "serif", fontStyle: "italic" }}

@@ -105,7 +105,7 @@ const CheckoutPage: React.FC = () => {
   };
 
   return (
-    <div className='text-inherit'>
+    <div className='text-inherit bg-white'>
       <h1>Checkout Page</h1>
       <div>
         <h2>Order Summary</h2>

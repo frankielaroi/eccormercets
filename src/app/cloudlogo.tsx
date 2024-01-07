@@ -1,7 +1,7 @@
 import React from "react";
 function CloudLogo() {
   return (
-    <div className="container mx-auto pt-16">
+    <div className="container mx-auto pt-16 bg-white">
       <div className="w-11/12 xl:w-2/3 lg:w-2/3 md:w-2/3 mx-auto sm:mb-10 mb-16">
         <h1 className=" xl:text-5xl md:text-3xl text-xl text-center text-gray-800 font-extrabold mb-5 pt-4">
           Partnerships with Coveted Brands

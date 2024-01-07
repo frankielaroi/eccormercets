@@ -5,11 +5,11 @@ import Footer  from '../footer'
 
 export default function Category() {
     return (
-        <>
+        <div className='bg-white'>
             <Header item={undefined}></Header>
             <Item></Item>
             <Footer></Footer>
-        </>
+        </div>
     )
     
 }

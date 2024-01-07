@@ -61,7 +61,7 @@ const itemsData: Item[] = Object.entries(snapshot.val()).map(([id, data]: [strin
 
     return (
      
-     <div className="lg:w-1/4 md:w-1/2 p-4 w-full text-inherit">
+     <div className="lg:w-1/4 md:w-1/2 p-4 w-full text-inherit bg-white">
         <a className="block relative h-48 rounded overflow-hidden">
           <Link href={`../product/${item.id}`}> 
         <img 
@@ -111,7 +111,7 @@ const itemsData: Item[] = Object.entries(snapshot.val()).map(([id, data]: [strin
 
   return (
     <div>
-      <div className="flex flex-row justify-between text-inherit">
+      <div className="flex flex-row justify-between text-inherit bg-white">
         <Button color="inherit" onClick={() => handleHeaderChange("All")}>
           All
         </Button>

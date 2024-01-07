@@ -33,7 +33,7 @@ const SideDrawer = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
 
    return (
     <Drawer anchor="left" open={isOpen} onClose={onClose}>
-      <div className="pt-6 flex flex-col">
+      <div className="pt-6 flex flex-col bg-white">
         {[
           { text: 'Account', url: accountLink },
           { text: 'Categories', url: '../categories' },

@@ -16,7 +16,7 @@ import Link from 'next/link';
 export default function Home() {
   return (
 <>
-    <div>
+    <div className='bg-white'>
       <div>
       <Header item={undefined} />
       <Image src={Lady} width={1000} alt={''} />

@@ -116,7 +116,7 @@ const handleGithubLogin = async () => {
   
   return (
     
-    <div className="h-screen w-full text-inherit">
+    <div className="h-screen w-full text-inherit bg-white">
       <div className="h-full w-full flex items-center justify-center">
         <div className="h-full w-full">
           <div
@@ -124,18 +124,14 @@ const handleGithubLogin = async () => {
           >
             <ul className="inline-flex items-center text-xl gap-10">
               <li>
-                <IconButton onClick={handleGoogleLogin}>
-                  <Google sx={{
-                    color:'WindowText'
-                  }} />
-                </IconButton>
+                <a onClick={handleGoogleLogin}>
+                  <Google />
+                </a>
               </li>
               <li>
-                <IconButton onClick={handleGithubLogin}>
-                  <GitHub sx={{
-                    color:'WindowText'
-                  }} />
-                </IconButton>
+                <a onClick={handleGithubLogin}>
+                  <GitHub  />
+                </a>
               </li>
             </ul>
             <p className="text-inherit text-right">or use email your account</p>

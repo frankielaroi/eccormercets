@@ -39,7 +39,7 @@ export default function Account() {
         getItem()
     }, [uid]);
     return (
-        <div className='flex place-content-evenly flex-col'>
+        <div className='flex place-content-evenly flex-col bg-white'>
             <Header item={undefined} /> 
             <div className='flex place-content-center'>
            <div className='flex flex-col'> <Avatar src={user?.photoURL} sx={{

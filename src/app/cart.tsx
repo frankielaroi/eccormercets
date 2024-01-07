@@ -61,7 +61,7 @@ const Cart = ({
     <Drawer anchor="right" open={isOpen} onClose={onClose} sx={{
       maxWidth:20
     }}>
-      <div className="flex flex-col place-content-between">
+      <div className="flex flex-col place-content-between bg-white">
       <div className="flex flex-row place-content-between"> <h2 className="p-5"><ShoppingCart sx={{minHeight:30,minWidth:30}}/> Shopping Cart</h2>
       <IconButton onClick={onClose} sx={{width:50,height:50}}><Clear sx={{}}/></IconButton></div>
       <ul>
