@@ -124,12 +124,12 @@ const handleGithubLogin = async () => {
           >
             <ul className="inline-flex items-center text-xl gap-10">
               <li>
-                <a onClick={handleGoogleLogin}>
+                <a onClick={handleGoogleLogin} className="inline-block w-full px-6 py-3 mb-4 font-bold text-center uppercase align-middle transition-all bg-transparent border border-gray-200 border-solid rounded-lg shadow-none cursor-pointer hover:scale-102 leading-pro text-xs ease-soft-in tracking-tight-soft bg-150 bg-x-25 hover:bg-transparent hover:opacity-75">
                   <Google />
-                </a>
+                </a> 
               </li>
               <li>
-                <a onClick={handleGithubLogin}>
+                <a onClick={handleGithubLogin} className="inline-block w-full px-6 py-3 mb-4 font-bold text-center uppercase align-middle transition-all bg-transparent border border-gray-200 border-solid rounded-lg shadow-none cursor-pointer hover:scale-102 leading-pro text-xs ease-soft-in tracking-tight-soft bg-150 bg-x-25 hover:bg-transparent hover:opacity-75">
                   <GitHub  />
                 </a>
               </li>
@@ -139,7 +139,7 @@ const handleGithubLogin = async () => {
               type="email"
               name=""
               id=""
-              className="bg-white/50 hover:bg-white md:bg-white placeholder:text-violet-500 placeholder:text-sm text-violet-500 py-3 px-5 focus:text-violet-500 focus:outline focus:outline-offset-1 focus:outline-violet-500 rounded-md"
+              className="bg-white/50 hover:bg-black md:bg-black placeholder:text-violet-500 placeholder:text-sm text-violet-500 py-3 px-5 focus:text-violet-500 focus:outline focus:outline-offset-1 focus:outline-violet-500 rounded-md"
               placeholder="Enter Your Email Here!"
               value={email}
               onChange={handleEmailChange}
@@ -148,7 +148,7 @@ const handleGithubLogin = async () => {
               type="password"
               name=""
               id=""
-              className="w-200 bg-white/50 hover:bg-white md:bg-white placeholder:text-violet-500 placeholder:text-sm text-violet-500 py-3 px-5 focus:text-violet-500 focus:outline focus:outline-offset-1 focus:outline-violet-500 rounded-md"
+              className="w-200 bg-white/50 hover:bg-black md:bg-white placeholder:text-violet-500 placeholder:text-sm text-violet-500 py-3 px-5 focus:text-violet-500 focus:outline focus:outline-offset-1 focus:outline-violet-500 rounded-md"
               placeholder="Enter Your Password Here!"
               value={password}
               onChange={handlePasswordChange}
@@ -161,7 +161,7 @@ const handleGithubLogin = async () => {
               </a>
             </div>
             <button
-              onClick={signInWithEmailPassword} className="px-6 py-2 bg-violet-500 rounded hover:bg-white hover:text-violet-700 font-semibold transition-all text-white hover:scale-110"
+              onClick={signInWithEmailPassword} className="px-6 py-2 bg-violet-500 rounded hover:bg-black hover:text-violet-700 font-semibold transition-all text-white hover:scale-110"
             >
               Submit
             </button>
