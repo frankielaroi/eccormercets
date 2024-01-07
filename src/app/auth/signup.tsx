@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { GoogleAuthProvider, FacebookAuthProvider, signInWithPopup, getAuth, GithubAuthProvider, createUserWithEmailAndPassword, sendEmailVerification, User, UserCredential } from 'firebase/auth';
 import { auth, database } from '../firebase';
 import { getDatabase, ref, set, get } from 'firebase/database';
-import { Apple, Facebook, Google } from '@mui/icons-material';
+import { Apple, Facebook, GitHub, Google } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import Account from '../user/[uid]/page';
 
@@ -177,20 +177,15 @@ const setUserIfNotExists = async (user: User) => {
   };
 
     return <>
-      <div className="w-full max-w-full px-3 mx-auto mt-0 md:flex-0 shrink-0">
+      <div className="w-full max-w-full px-3 mx-auto mt-0 md:flex-0 shrink-0 text-inherit">
         <div className="relative z-0 flex flex-col min-w-0 break-words bg-inherit border-0 shadow-soft-xl rounded-2xl bg-clip-border">
           <div className="p-6 mb-0 text-center bg-inherit border-b-0 rounded-t-2xl">
             <h5>Register with</h5>
           </div>
           <div className="flex flex-wrap px-3 -mx-3 sm:px-6 xl:px-12">
-            <div className="w-3/12 max-w-full px-1 ml-auto flex-0">
-              <a className="inline-block w-full px-6 py-3 mb-4 font-bold text-center uppercase align-middle transition-all bg-transparent border border-gray-200 border-solid rounded-lg shadow-none cursor-pointer hover:scale-102 leading-pro text-xs ease-soft-in tracking-tight-soft bg-150 bg-x-25 hover:bg-transparent hover:opacity-75">
-                <Facebook></Facebook>
-              </a>
-            </div>
             <div className="w-3/12 max-w-full px-1 flex-0" onClick={handleGitHubLogin}>
               <a className="inline-block w-full px-6 py-3 mb-4 font-bold text-center uppercase align-middle transition-all bg-transparent border border-gray-200 border-solid rounded-lg shadow-none cursor-pointer hover:scale-102 leading-pro text-xs ease-soft-in tracking-tight-soft bg-150 bg-x-25 hover:bg-transparent hover:opacity-75">
-                <Apple></Apple>
+                <GitHub></GitHub>
               </a>
             </div>
             <div className="w-3/12 max-w-full px-1 mr-auto flex-0" onClick={handleGoogleLogin}>

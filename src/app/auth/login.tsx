@@ -116,7 +116,7 @@ const handleGithubLogin = async () => {
   
   return (
     
-    <div className="h-screen w-full">
+    <div className="h-screen w-full text-inherit">
       <div className="h-full w-full flex items-center justify-center">
         <div className="h-full w-full">
           <div

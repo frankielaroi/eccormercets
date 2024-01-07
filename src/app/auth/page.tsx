@@ -23,7 +23,7 @@ export default function User() {
 
   function Heade() {
     return (
-      <div className="flex place-content-center p-0">
+      <div className="flex place-content-center p-0 text-inherit">
         <Button color="inherit" onClick={() => handleHeaderChange('Login')}>
           Login
         </Button>
