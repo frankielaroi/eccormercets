@@ -125,12 +125,16 @@ const handleGithubLogin = async () => {
             <ul className="inline-flex items-center text-xl gap-10">
               <li>
                 <IconButton onClick={handleGoogleLogin}>
-                  <Google />
+                  <Google sx={{
+                    color:'WindowText'
+                  }} />
                 </IconButton>
               </li>
               <li>
                 <IconButton onClick={handleGithubLogin}>
-                  <GitHub />
+                  <GitHub sx={{
+                    color:'WindowText'
+                  }} />
                 </IconButton>
               </li>
             </ul>

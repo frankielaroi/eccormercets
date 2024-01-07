@@ -182,14 +182,14 @@ const setUserIfNotExists = async (user: User) => {
           <div className="p-6 mb-0 text-center bg-inherit border-b-0 rounded-t-2xl">
             <h5>Register with</h5>
           </div>
-          <div className="flex flex-wrap px-3 -mx-3 sm:px-6 xl:px-12">
-            <div className="w-3/12 max-w-full px-1 flex-0" onClick={handleGitHubLogin}>
-              <a className="inline-block w-full px-6 py-3 mb-4 font-bold text-center uppercase align-middle transition-all bg-transparent border border-gray-200 border-solid rounded-lg shadow-none cursor-pointer hover:scale-102 leading-pro text-xs ease-soft-in tracking-tight-soft bg-150 bg-x-25 hover:bg-transparent hover:opacity-75">
+          <div className="flex flex-wrap  -mx-3 sm:px-6 xl:px-12 place-content-center">
+            <div className="w-3/12 place-content-center  flex-0" >
+              <a  onClick={handleGitHubLogin} className="inline-block w-full px-6 py-3 mb-4 font-bold text-center uppercase align-middle transition-all bg-transparent border border-gray-200 border-solid rounded-lg shadow-none cursor-pointer hover:scale-102 leading-pro text-xs ease-soft-in tracking-tight-soft bg-150 bg-x-25 hover:bg-transparent hover:opacity-75">
                 <GitHub></GitHub>
               </a>
             </div>
-            <div className="w-3/12 max-w-full px-1 mr-auto flex-0" onClick={handleGoogleLogin}>
-              <a className="inline-block w-full px-6 py-3 mb-4 font-bold text-center  uppercase align-middle transition-all bg-transparent border border-gray-200 border-solid rounded-lg shadow-none cursor-pointer hover:scale-102 leading-pro text-xs ease-soft-in tracking-tight-soft bg-150 bg-x-25 hover:bg-transparent hover:opacity-75">
+            <div className="w-3/12 place-content-center flex-0" >
+              <a onClick={handleGoogleLogin} className="inline-block w-full px-6 py-3 mb-4 font-bold text-center  uppercase align-middle transition-all bg-transparent border border-gray-200 border-solid rounded-lg shadow-none cursor-pointer hover:scale-102 leading-pro text-xs ease-soft-in tracking-tight-soft bg-150 bg-x-25 hover:bg-transparent hover:opacity-75">
                 <Google></Google>
               </a>
             </div>
