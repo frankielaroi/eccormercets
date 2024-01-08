@@ -28,7 +28,8 @@ export default function User() {
     return (
       <div className='flex flex-col place-content-between'>
         <Header item={undefined} />
-      <div className="flex place-content-evenly m-5 text-inherit">
+        <div className="flex place-content-evenly m-5 text-inherit">
+          
         <Button variant='outlined' color="inherit" onClick={() => handleHeaderChange('Login')} className='px-5'>
           <Typography variant='h5' fontFamily={'serif'}>Login</Typography> 
         </Button>
@@ -36,7 +37,7 @@ export default function User() {
           <Typography variant='h5'fontFamily={'serif'}>Sign Up</Typography> 
         </Button>
         </div>
-        
+                <Typography variant='h6' fontFamily={'cursive'}>Wait a Few seconds after signing in it will redirect to a page</Typography>
       </div>
     );
   }
