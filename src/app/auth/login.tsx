@@ -116,7 +116,7 @@ const handleGithubLogin = async () => {
   
   return (
     
-    <div className="h-screen w-full text-inherit bg-white">
+    <div className="h-screen w-full text-inherit">
       <div className="h-full w-full flex items-center justify-center">
         <div className="h-full w-full">
           <div
@@ -152,7 +152,7 @@ const handleGithubLogin = async () => {
               type="password"
               name=""
               id=""
-              className="w-200 bg-white/50 hover:bg-black md:bg-white placeholder:text-violet-500 placeholder:text-sm text-violet-500 py-3 px-5 focus:text-violet-500 focus:outline focus:outline-offset-1 focus:outline-violet-500 rounded-md"
+              className="w-200 bg-white/50 hover:bg-white md:bg-black placeholder:text-violet-500 placeholder:text-sm text-violet-500 py-3 px-5 focus:text-violet-500 focus:outline focus:outline-offset-1 focus:outline-violet-500 rounded-md"
               placeholder="Enter Your Password Here!"
               value={password}
               onChange={handlePasswordChange}
@@ -165,7 +165,7 @@ const handleGithubLogin = async () => {
               </a>
             </div>
             <button
-              onClick={signInWithEmailPassword} className="px-6 py-2 bg-violet-500 rounded hover:bg-black hover:text-violet-700 font-semibold transition-all text-white hover:scale-110"
+              onClick={signInWithEmailPassword} className="px-6 py-2 bg-violet-500 rounded hover:bg-white hover:text-violet-700 font-semibold transition-all text-black hover:scale-110"
             >
               Submit
             </button>
