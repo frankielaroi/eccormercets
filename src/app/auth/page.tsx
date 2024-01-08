@@ -3,7 +3,9 @@
 import React, { useState } from 'react';
 import Login from './login';
 import Signup from './signup';
-import { Button } from '@mui/material';
+import { Button, Typography } from '@mui/material';
+import Header from '../header';
+import Footer from '../footer';
 
 export default function User() {
   const [selectedHeader, setSelectedHeader] = useState('Login');
@@ -18,18 +20,23 @@ export default function User() {
       <div className="p-5">
         {selectedHeader === 'Login' ? <Login /> : <Signup />}
       </div>
+      <Footer />
     </>
   );
 
   function Heade() {
     return (
-      <div className="flex place-content-center p-0 text-inherit bg-white">
-        <Button color="inherit" onClick={() => handleHeaderChange('Login')}>
-          Login
+      <div className='flex flex-col place-content-between'>
+        <Header item={undefined} />
+      <div className="flex place-content-evenly m-5 text-inherit">
+        <Button variant='outlined' color="inherit" onClick={() => handleHeaderChange('Login')} className='px-5'>
+          <Typography variant='h5' fontFamily={'serif'}>Login</Typography> 
         </Button>
-        <Button color="inherit" onClick={() => handleHeaderChange('Signup')}>
-          Sign Up
+          <Button     variant='outlined' color="inherit" onClick={() => handleHeaderChange('Signup')}>
+          <Typography variant='h5'fontFamily={'serif'}>Sign Up</Typography> 
         </Button>
+        </div>
+        
       </div>
     );
   }
