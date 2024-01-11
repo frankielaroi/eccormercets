@@ -95,7 +95,7 @@ const email = Cookies.get('email') || '';
     ],
   },
   publicKey,
-  text: "FRANKIE MADE THIS",
+  text: "Just Pay ",
   onSuccess: placeOrder,
   onClose: () => alert("Wait! Don't leave :("),
 };
@@ -114,7 +114,7 @@ const email = Cookies.get('email') || '';
         <TextField
           value={name}
           label="Your Name"
-          onChange={(e) => setNumber(e.target.value)}
+          onChange={(e) => setName(e.target.value)}
         />
         <TextField
           value={number}
@@ -122,7 +122,7 @@ const email = Cookies.get('email') || '';
           onChange={(e) => setNumber(e.target.value)}
         />
       </div>
-      <PaystackButton  {...componentProps}>
+      <PaystackButton  {...componentProps} className='b'>
         Place Order
       </PaystackButton>
     </div>
