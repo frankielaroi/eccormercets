@@ -62,12 +62,12 @@ const signIn = async () => {
       lastLogin: Date.now(),
     });
 
-    console.log('Verification email sent');
-    Cookies.set('uid', user.uid, { secure: true, expires: 1 });
-    Cookies.set('isLoggedIn', 'true', { secure: true, expires: 1 });
-
-    console.log('User ID:', user.uid);
-    console.log('Login Status:', true);
+    console.log('GitHub login successful');
+      Cookies.set('uid', user.uid, { secure: true, });
+      Cookies.set('isLoggedIn', 'true', { secure: true, });
+      Cookies.set('email', email, { secure: true })
+      console.log('User ID:', user.uid);
+      console.log('Login Status:', true);
 
     router.push(`../user/${user.uid}`);
   } catch (err:any) {
@@ -106,14 +106,12 @@ const setUserIfNotExists = async (user: User) => {
 
     if (user) {
       await setUserIfNotExists(user);
-
-      console.log('Google login successful');
+console.log('GitHub login successful');
       Cookies.set('uid', user.uid, { secure: true, });
       Cookies.set('isLoggedIn', 'true', { secure: true, });
-
+      Cookies.set('email', email, { secure: true })
       console.log('User ID:', user.uid);
       console.log('Login Status:', true);
-
       router.push(`../user/${user.uid}`);
     } else {
       console.error('Google login failed: User is undefined');
@@ -140,7 +138,7 @@ const setUserIfNotExists = async (user: User) => {
       console.log('GitHub login successful');
       Cookies.set('uid', user.uid, { secure: true, });
       Cookies.set('isLoggedIn', 'true', { secure: true, });
-
+      Cookies.set('email', email, { secure: true })
       console.log('User ID:', user.uid);
       console.log('Login Status:', true);
 

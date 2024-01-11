@@ -37,7 +37,7 @@ export default function User() {
           <Typography variant='h5'fontFamily={'serif'}>Sign Up</Typography> 
         </Button>
         </div>
-               <marquee direction='right'><Typography variant='h6' fontFamily={'cursive'}>Wait a Few seconds after signing in it will redirect to a page</Typography></marquee> 
+               <Typography variant='h6' fontFamily={'cursive'}>Wait a Few seconds after signing in it will redirect to a page</Typography> 
       </div>
     );
   }

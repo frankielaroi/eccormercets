@@ -7,6 +7,7 @@ import { Clear,ShoppingCart, ShoppingCartCheckout } from "@mui/icons-material";
 import { Button, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import Cookies from 'js-cookie'
+import Link from "next/link";
 
 const Cart = ({
   isOpen,
@@ -53,8 +54,7 @@ const Cart = ({
   };
   const handleCheckout = () => {
       localStorage.setItem('cartItems', JSON.stringify(cartItems));
-    // Navigate to the checkout page
-    router.push('/checkout');
+    // Navigate to the checkout page;
   };
 
   return (
@@ -93,7 +93,7 @@ const Cart = ({
           height: 30,
           marginTop: 5,
         }}
-startIcon={<ShoppingCartCheckout />} onClick={handleCheckout} >CHECKOUT</Button>      </div>
+startIcon={<ShoppingCartCheckout />} onClick={handleCheckout} ><Link href={'./checkout'} prefetch>CHECKOUT</Link></Button>      </div>
     </Drawer>
   );
 };

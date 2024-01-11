@@ -1,11 +1,14 @@
 // CheckoutPage.tsx
-'use client';
+'use client'
+// CheckoutPage.tsx
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { get, ref, push, set } from 'firebase/database';
 import { database } from '../firebase';
 import Cookies from 'js-cookie';
 import { Button, TextField } from '@mui/material';
+import { PaystackButton } from 'react-paystack'
+
 
 interface CartItem {
   id: string;
@@ -14,10 +17,13 @@ interface CartItem {
 }
 
 const CheckoutPage: React.FC = () => {
+  const publicKey='pk_test_696369ceee103648c4353e3d040374e7d91094e0';
   const router = useRouter();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [totalAmount, setTotalAmount] = useState<number>(0);
-  const [userContact,setContact]=useState<number>()
+  const [number, setNumber] = useState<string>('');
+  const [user, setUser] = useState<string | undefined>();
+  const [name,setName]=useState<string>('')
 
   useEffect(() => {
     const retrieveCartItems = () => {
@@ -32,77 +38,67 @@ const CheckoutPage: React.FC = () => {
     };
 
     retrieveCartItems();
+
+    // Retrieve user ID from cookies
+    const userId = Cookies.get('uid');
+    
+    setUser(userId);
   }, []);
-
-  const user = Cookies.get('uid');
-  
-
+const email = Cookies.get('email') || '';
   const placeOrder = async () => {
     try {
       const orderData = {
         userId: user, // Replace with actual user ID
         items: cartItems,
         totalAmount,
-        userContact,
+        number,
         orderDate: new Date().toISOString(),
       };
 
-      // Make API call to initiate money request
-      const apiResponse = await initiateMoneyRequest(orderData);
+      // Make API call to initiate Paystack transaction
 
-      if (apiResponse === true) {
-        // If the API response is true, store the order in the database
-        const ordersRef = ref(database, 'orders');
-        const newOrderRef = push(ordersRef);
-        await set(newOrderRef, orderData);
+      // If the Paystack API response is successful, store the order in the database
+      const ordersRef = ref(database, 'orders');
+      const newOrderRef = push(ordersRef);
+      await set(newOrderRef, orderData);
 
-        // Optionally, you can clear the user's cart or perform other necessary actions
-        localStorage.removeItem('cartItems');
+      // Optionally, you can clear the user's cart or perform other necessary actions
+      localStorage.removeItem('cartItems');
 
-        console.log('Order placed successfully!');
-        router.push('/orders'); // Redirect to orders page or any other desired page
-      } else {
-        console.error('Money request initiation failed.');
-      }
-    } catch (error) {
-      console.error('Error placing order:', error);
+      console.log('Order placed successfully!');
+    } finally {
+      router.push('/orders'); // Redirect to orders page or any other desired page
     }
+   
+ 
+
+  
+  
+
+
   };
-
-  const initiateMoneyRequest = async (orderData: any) => {
-    try {
-      const mobileNumber = userContact;
-      const resp = await fetch(
-        `https://devp-reqsendmoney-230622-api.hubtel.com/request-money/${mobileNumber}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'Basic ' + Buffer.from('<username>:<password>').toString('base64'),
-          },
-          body: JSON.stringify({
-            amount: orderData.totalAmount,
-            title: 'Order Payment',
-            description: 'Payment for order',
-            clientReference: orderData.userId,
-            callbackUrl: 'http://example.com',
-            cancellationUrl: 'http://example.com',
-            returnUrl: 'http://example.com',
-            logo: 'http://example.com',
-          }),
-        }
-      );
-
-      const data = await resp.json();
-      console.log(data);
-
-      // Assuming the API response contains a 'success' field indicating the success of the money request
-      return data.success === true;
-    } catch (error) {
-      console.error('Error initiating money request:', error);
-      return false;
-    }
-  };
+  const componentProps = {
+  email,
+  amount: totalAmount,
+  metadata: {
+    custom_fields: [
+      {
+        display_name: "Name",
+        variable_name: "name",
+        value: name,
+      },
+      {
+        display_name: "Phone Number",
+        variable_name: "phone",
+        value: number,
+      },
+    ],
+  },
+  publicKey,
+  text: "FRANKIE MADE THIS",
+  onSuccess: placeOrder,
+  onClose: () => alert("Wait! Don't leave :("),
+};
 
   return (
     <div className='text-inherit bg-white'>
@@ -115,9 +111,20 @@ const CheckoutPage: React.FC = () => {
           </div>
         ))}
         <p>Total Amount: ${totalAmount}</p>
-        <TextField value={userContact}/>
+        <TextField
+          value={name}
+          label="Your Name"
+          onChange={(e) => setNumber(e.target.value)}
+        />
+        <TextField
+          value={number}
+          label="Contact Number"
+          onChange={(e) => setNumber(e.target.value)}
+        />
       </div>
-      <Button variant={'contained'} onClick={placeOrder}>Place Order</Button>
+      <PaystackButton  {...componentProps}>
+        Place Order
+      </PaystackButton>
     </div>
   );
 };
