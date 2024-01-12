@@ -12,7 +12,7 @@ const [items, setItems] = useState<Item[]>([]);
 
   // Item interface...
   type Item = {
-  id: number;
+  id: string;
   Category: string;
   availability: boolean;
   average_rating: number;

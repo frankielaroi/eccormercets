@@ -11,7 +11,7 @@ import { database } from "./firebase";
 import ProductPage from './product/[id]/page';
 
 type Item = {
-  id: number;
+  id: string;
   Category: string;
   availability: boolean;
   average_rating: number;
@@ -39,7 +39,7 @@ const itemsData: Item[] = Object.entries(snapshot.val()).map(([id, data]: [strin
   ...data
 }));
 
-        setItems(itemsData);
+        setItems(itemsData);  
       } else {
         setItems([]);
       }

@@ -6,24 +6,27 @@ import { useRouter } from 'next/navigation';
 import { get, ref, push, set } from 'firebase/database';
 import { database } from '../firebase';
 import Cookies from 'js-cookie';
-import { Button, TextField } from '@mui/material';
+import { Button,TextField } from '@mui/material';
 import { PaystackButton } from 'react-paystack'
+import Image from 'next/image'
 
 
 interface CartItem {
   id: string;
   name: string;
   selling_price: number;
+  images: string; // Assuming images is a string URL, adjust if it's an array
+
 }
 
 const CheckoutPage: React.FC = () => {
-  const publicKey='pk_test_696369ceee103648c4353e3d040374e7d91094e0';
+  const publicKey = 'pk_test_696369ceee103648c4353e3d040374e7d91094e0';
   const router = useRouter();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [totalAmount, setTotalAmount] = useState<number>(0);
   const [number, setNumber] = useState<string>('');
   const [user, setUser] = useState<string | undefined>();
-  const [name,setName]=useState<string>('')
+  const [name, setName] = useState<string>('')
 
   useEffect(() => {
     const retrieveCartItems = () => {
@@ -44,7 +47,7 @@ const CheckoutPage: React.FC = () => {
     
     setUser(userId);
   }, []);
-const email = Cookies.get('email') || '';
+  const email = Cookies.get('email') || '';
   const placeOrder = async () => {
     try {
       const orderData = {
@@ -77,56 +80,85 @@ const email = Cookies.get('email') || '';
 
 
   };
-  const componentProps = {
-  email,
-  amount: totalAmount,
-  metadata: {
-    custom_fields: [
-      {
-        display_name: "Name",
-        variable_name: "name",
-        value: name,
-      },
-      {
-        display_name: "Phone Number",
-        variable_name: "phone",
-        value: number,
-      },
-    ],
-  },
-  publicKey,
-  text: "Just Pay ",
-  onSuccess: placeOrder,
-  onClose: () => alert("Wait! Don't leave :("),
+  const amount = totalAmount
+  const metadata = {
+  name:name,
+  phone:number,
+  custom_fields: [],
 };
 
+  const componentProps = {
+    email,
+    amount,
+     metadata: metadata,
+    publicKey,
+    text: 'Buy Now',
+    onSuccess: () => {
+      alert(
+        `Your purchase was successful! Transaction reference`
+      );
+    },
+    onClose: () => alert("Wait! You need this oil, don't go!!!!"),
+  };
+
   return (
-    <div className='text-inherit bg-white'>
-      <h1>Checkout Page</h1>
+    <div className="text-inherit bg-white">
       <div>
-        <h2>Order Summary</h2>
-        {cartItems.map((item) => (
-          <div key={item.id}>
-            <p>{item.name} - ${item.selling_price}</p>
+        <h1>Checkout Page</h1>
+        <div>
+          <h2>Order Summary</h2>
+          {cartItems.map((item) => (
+            <div key={item.id}>
+              <div className="flex flex-col xl:flex-row justify-center xl:justify-between space-y-6 xl:space-y-0 xl:space-x-6 w-full">
+                <div className="xl:w-full flex flex-col sm:flex-row xl:flex-col justify-center items-center bg-gray-100 py-7 sm:py-0 xl:py-10 px-10">
+                  <div className="flex flex-col justify-start items-start w-full space-y-4">
+                    <p className="text-xl md:text-2xl leading-normal text-gray-800">
+                      {item.name}
+                    </p>
+                    <p className="text-base font-semibold leading-none text-gray-600">
+                      ${item.selling_price}
+                    </p>
+                  </div>
+                  <div className="mt-6 sm:mt-0 xl:my-10 xl:px-20 w-52 sm:w-96 xl:w-auto">
+                    <Image
+                      src={item.images}
+                      alt="headphones"
+                      width={50}
+                      height={60}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+          <p>Total Amount: ${totalAmount}</p>
+          <div className="flex flex-col">
+            <TextField
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Name"
+              label="Name"
+              sx={{
+                width: 500,
+              }}
+            />
+            <TextField
+              value={number}
+              onChange={(e) => setNumber(e.target.value)}
+              placeholder="Mobile Number"
+              label="Mobile Number"
+              sx={{
+                width: 500,
+              }}
+            />
           </div>
-        ))}
-        <p>Total Amount: ${totalAmount}</p>
-        <TextField
-          value={name}
-          label="Your Name"
-          onChange={(e) => setName(e.target.value)}
-        />
-        <TextField
-          value={number}
-          label="Contact Number"
-          onChange={(e) => setNumber(e.target.value)}
-        />
+        </div>
+        <PaystackButton {...componentProps} className="b">
+          Place Order
+        </PaystackButton>
       </div>
-      <PaystackButton  {...componentProps} className='b'>
-        Place Order
-      </PaystackButton>
     </div>
   );
 };
 
-export default CheckoutPage;
+
