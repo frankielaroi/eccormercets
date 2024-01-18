@@ -35,7 +35,7 @@ const Header = ({ item }: { item: any }) => {
       </Button>
       <SideDrawer isOpen={isDrawerOpen} onClose={handleDrawerClose} />
       <Typography variant="h4" className="font-serif pt-3">
-        <Link href={'./'}>
+        <Link href={'/'}>
           Frankie
         </Link>
       </Typography>

@@ -24,7 +24,7 @@ interface Item {
 }
 
 const ProductPage = () => {
- const { id } = useParams();
+  const { id } = useParams<any>(); // Update the type of id to any
   const [item, setItem] = useState<Item | null>(null);
   const [rerender, setRerender] = useState(false);
 

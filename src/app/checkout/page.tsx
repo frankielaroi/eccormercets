@@ -1,32 +1,30 @@
 // CheckoutPage.tsx
 'use client'
-// CheckoutPage.tsx
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { get, ref, push, set } from 'firebase/database';
 import { database } from '../firebase';
 import Cookies from 'js-cookie';
-import { Button,TextField } from '@mui/material';
-import { PaystackButton } from 'react-paystack'
-import Image from 'next/image'
-
+import { Button, TextField } from '@mui/material';
+import Image from 'next/image';
+import axios from 'axios';
 
 interface CartItem {
   id: string;
   name: string;
   selling_price: number;
   images: string; // Assuming images is a string URL, adjust if it's an array
-
 }
 
 const CheckoutPage: React.FC = () => {
-  const publicKey = 'pk_test_696369ceee103648c4353e3d040374e7d91094e0';
   const router = useRouter();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [totalAmount, setTotalAmount] = useState<number>(0);
-  const [number, setNumber] = useState<string>('');
   const [user, setUser] = useState<string | undefined>();
-  const [name, setName] = useState<string>('')
+  const [name, setName] = useState<string>('');
+  const [number, setNumber] = useState('');
+  const [momoToken, setMomoToken] = useState<string | null>(null);
+  const [momoResponse, setMomoResponse] = useState<any | null>(null);
 
   useEffect(() => {
     const retrieveCartItems = () => {
@@ -44,61 +42,97 @@ const CheckoutPage: React.FC = () => {
 
     // Retrieve user ID from cookies
     const userId = Cookies.get('uid');
-    
+
     setUser(userId);
   }, []);
-  const email = Cookies.get('email') || '';
-  const placeOrder = async () => {
-    try {
-      const orderData = {
-        userId: user, // Replace with actual user ID
-        items: cartItems,
-        totalAmount,
-        number,
-        orderDate: new Date().toISOString(),
-      };
 
-      // Make API call to initiate Paystack transaction
+  useEffect(() => {
+    const getMomoToken = async () => {
+      try {
+        const token = await axios({
+          method: 'post',
+          url: 'https://sandbox.momodeveloper.mtn.com/collection/token/',
+          headers: {
+            'Content-Type': 'application/json',
+            'Ocp-Apim-Subscription-Key': 'bbbf209827d7426aaf37eb2fc208a2a4',
+          },
+        });
+        setMomoToken(token.data.access_token);
+      } catch (error) {
+        console.error('Error fetching MoMo token:', error);
+      }
+    };
 
-      // If the Paystack API response is successful, store the order in the database
-      const ordersRef = ref(database, 'orders');
-      const newOrderRef = push(ordersRef);
-      await set(newOrderRef, orderData);
+    getMomoToken();
+  }, []);
 
-      // Optionally, you can clear the user's cart or perform other necessary actions
-      localStorage.removeItem('cartItems');
-
-      console.log('Order placed successfully!');
-    } finally {
-      router.push('/orders'); // Redirect to orders page or any other desired page
+  const requestToPay = async () => {
+    if (!momoToken) {
+      alert('Please wait for MoMo token');
+      return;
     }
-   
- 
 
-  
-  
+    if (!number) {
+      alert('Please enter a phone number');
+      return;
+    }
 
+    const body = {
+      amount: totalAmount,
+      currency: 'GHS',
+      externalId: 'c8f060db-5126-47a7-a67b-2fee08c0f30d',
+      payer: {
+        partyIdType: 'MSISDN',
+        partyId: number,
+      },
+      payerMessage: 'Payment for order',
+      payeeNote: 'Payment for order',
+    };
+    try {
+      const response = await axios({
+        method: 'post',
+        url: 'https://sandbox.momodeveloper.mtn.com/collection/v1_0/requesttopay',
+        headers: {
+          'Content-Type': 'application/json',
+          'Ocp-Apim-Subscription-Key': 'bbbf209827d7426aaf37eb2fc208a2a4',
+          'X-Reference-Id': '123456789',
+          'X-Target-Environment': 'sandbox',
+          'X-Callback-Url': 'http://localhost:3000/callback',
+          'X-Callback-Host': 'http://localhost:3000',
+          Authorization: `Bearer ${momoToken}`,
+        },
+        data: body,
+      });
 
-  };
-  const amount = totalAmount
-  const metadata = {
-  name:name,
-  phone:number,
-  custom_fields: [],
-};
+      setMomoResponse(response.data);
 
-  const componentProps = {
-    email,
-    amount,
-     metadata: metadata,
-    publicKey,
-    text: 'Buy Now',
-    onSuccess: () => {
-      alert(
-        `Your purchase was successful! Transaction reference`
-      );
-    },
-    onClose: () => alert("Wait! You need this oil, don't go!!!!"),
+      if (response.data.statusCode === 200) {
+        // Your logic when payment is successful, e.g., place the order
+        const orderData = {
+          userId: user, // Replace with actual user ID
+          items: cartItems,
+          totalAmount,
+          number,
+          orderDate: new Date().toISOString(),
+        };
+
+        // Make API call to store the order in the database
+        const ordersRef = ref(database, 'orders');
+        const newOrderRef = push(ordersRef);
+        await set(newOrderRef, orderData);
+
+        // Optionally, you can clear the user's cart or perform other necessary actions
+        localStorage.removeItem('cartItems');
+
+        console.log('Order placed successfully!');
+        router.push('/orders'); // Redirect to orders page or any other desired page
+      } else {
+        alert('Payment failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error processing MoMo payment:', error);
+      alert('Payment failed. Please try again.');
+    }
   };
 
   return (
@@ -153,12 +187,12 @@ const CheckoutPage: React.FC = () => {
             />
           </div>
         </div>
-        <PaystackButton {...componentProps} className="b">
+        <Button onClick={requestToPay} className="b">
           Place Order
-        </PaystackButton>
+        </Button>
       </div>
     </div>
   );
 };
 
-
+export default CheckoutPage;
