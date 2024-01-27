@@ -40,7 +40,7 @@ const Header = ({ item }: { item: any }) => {
         </Link>
       </Typography>
       <div className="pt-3">
-        <SearchIcon
+        <Link href={'/search'}></Link><SearchIcon
           sx={{
             width: 40,
             height: 40,
