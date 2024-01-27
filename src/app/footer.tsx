@@ -1,7 +1,10 @@
 import Link from 'next/link';
 import React from 'react';
+import Cookies from 'js-cookie';
 
 export default function Footer() {
+  const storedIsLoggedIn = true //Cookies.get('isLoggedIn');
+
   return (
     <div className="px-4 pt-16 mx-auto sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8 text-black">
       <div className="grid gap-10 row-gap-6 mb-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -31,6 +34,8 @@ export default function Footer() {
               FRANKIE
             </span>
           </Link>
+          <div>            {storedIsLoggedIn && <Link href={'/addItem'}>Add Item to Store</Link>}
+</div>
           <div className="mt-6 lg:max-w-sm">
           </div>
         </div>
