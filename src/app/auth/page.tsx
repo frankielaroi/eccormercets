@@ -6,6 +6,8 @@ import Signup from './signup';
 import { Button, Typography } from '@mui/material';
 import Header from '../header';
 import Footer from '../footer';
+import { Provider } from 'react-redux';
+import store from '../redux/store';
 
 export default function User() {
   const [selectedHeader, setSelectedHeader] = useState('Login');
@@ -15,13 +17,13 @@ export default function User() {
   };
 
   return (
-    <>
+    <Provider store={store}>
       <Heade />
       <div className="p-5">
         {selectedHeader === 'Login' ? <Login /> : <Signup />}
       </div>
       <Footer />
-    </>
+    </Provider>
   );
 
   function Heade() {

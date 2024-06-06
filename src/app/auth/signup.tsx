@@ -7,6 +7,8 @@ import { getDatabase, ref, set, get } from 'firebase/database';
 import { Apple, Facebook, GitHub, Google } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import Account from '../user/[uid]/page';
+import { login, logout } from '../redux/slices/authSlice';
+import { useDispatch, useSelector } from'react-redux';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
@@ -20,6 +22,7 @@ export default function Signup() {
   const [nameError, setNameError] = useState('');
 
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const handleEmailChange = (e: { target: { value: React.SetStateAction<string>; }; }) => {
     setEmail(e.target.value);
@@ -68,7 +71,7 @@ const signIn = async () => {
       Cookies.set('email', email, { secure: true })
       console.log('User ID:', user.uid);
       console.log('Login Status:', true);
-
+      dispatch(login({id: user.uid, name: user.displayName}));
     router.push(`../user/${user.uid}`);
   } catch (err:any) {
     if (err.code === 'auth/email-already-in-use') {
@@ -113,6 +116,7 @@ console.log('GitHub login successful');
       console.log('User ID:', user.uid);
       console.log('Login Status:', true);
       router.push(`../user/${user.uid}`);
+      dispatch(login({id: user.uid, name: user.displayName}));
     } else {
       console.error('Google login failed: User is undefined');
     }
@@ -141,7 +145,7 @@ console.log('GitHub login successful');
       Cookies.set('email', email, { secure: true })
       console.log('User ID:', user.uid);
       console.log('Login Status:', true);
-
+      dispatch(login({id: user.uid, name: user.displayName}));
       router.push(`../user/${user.uid}`);
     } else {
       console.error('GitHub login failed: User is undefined');

@@ -6,7 +6,10 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import Cart from './cart'; // Make sure to import the correct path
 import Link from 'next/link';
-import Image   from "next/image";
+import Image from "next/image";
+import { addItem } from './redux/slices/cartSlice';
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "./redux/store";
 import { database } from "./firebase";
 import ProductPage from './product/[id]/page';
 
@@ -28,7 +31,8 @@ const Arrivals = ({ onAddToCart }: { onAddToCart: (product: any) => void }) => {
   const [items, setItems] = useState<Item[]>([]);
   const [selectedHeader, setSelectedHeader] = useState('All');
   const [showCart, setShowCart] = useState(false);
-
+  const dispatch = useDispatch<AppDispatch>();
+  const cartItems = useSelector((state:RootState) => state.cart.items);
   useEffect(() => {
     const itemsRef = ref(database, 'items');
 
@@ -55,9 +59,12 @@ const itemsData: Item[] = Object.entries(snapshot.val()).map(([id, data]: [strin
   };
 
   const ArrivalItem = ({ item }: { item: Item }) => {
-    const handleAddToCart = (item:Item) => {
-      // Save item to local storage
-      localStorage.setItem('cartItems', JSON.stringify([...JSON.parse(localStorage.getItem('cartItems') || '[]'), item]));
+    const handleAddToCart = (item: Item) => {
+      const itemWithQuantity: Item & { quantity: number } = {
+        ...item,
+        quantity: 1,
+      };
+      dispatch(addItem(itemWithQuantity));
     };
 
     return (

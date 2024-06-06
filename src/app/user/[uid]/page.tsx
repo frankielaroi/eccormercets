@@ -6,6 +6,8 @@ import { useParams } from 'next/navigation';
 import { database } from '../../firebase';
 import { get, ref } from 'firebase/database';
 import { Avatar, Button, Typography } from '@mui/material';
+import { Provider } from 'react-redux';
+import store from '../../redux/store';
 interface User {
     uid: string;
     email: string,
@@ -39,6 +41,7 @@ export default function Account() {
         getItem()
     }, [uid]);
     return (
+        <Provider store={store}>
         <div className='flex place-content-evenly flex-col bg-white'>
             <Header item={undefined} /> 
             <div className='flex place-content-center'>
@@ -62,6 +65,7 @@ export default function Account() {
                 </div>
             </div>
             <Footer />
-        </div>
+            </div>
+            </Provider>
     )
 }

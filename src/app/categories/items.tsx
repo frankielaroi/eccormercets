@@ -4,11 +4,17 @@ import { Box, Button, IconButton } from '@mui/material';
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { database } from '../firebase';
 import { ref, onValue, getDatabase, off } from 'firebase/database';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../redux/store';
+import { login, logout } from '../redux/slices/authSlice';
+import { addItem } from '../redux/slices/cartSlice';
 import Link from 'next/link'
 
 export default function Item() {
   const [selectedHeader, setSelectedHeader] = useState("All");
 const [items, setItems] = useState<Item[]>([]);
+  const dispatch = useDispatch<AppDispatch>()
+  const cartItems = useSelector((state: RootState) => state.cart.items)
 
   // Item interface...
   type Item = {
@@ -52,11 +58,8 @@ const itemsData: Item[] = Object.entries(snapshot.val()).map(([id, data]: [any, 
 
   const ArrivalItem = ({ item }: { item: Item }) => {
     const handleAddToCart = (item: Item) => {
-      // Save item to local storage
-      localStorage.setItem(
-        'cartItems',
-        JSON.stringify([...JSON.parse(localStorage.getItem('cartItems') || '[]'), item])
-      );
+      const itemWithQuantity = { ...item, quantity: 1 };
+      dispatch(addItem(itemWithQuantity));
     };
 
     return (

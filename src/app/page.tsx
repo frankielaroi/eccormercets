@@ -9,12 +9,14 @@ import Stat from './stats';
 import Footer  from './footer';
 import Explore from './explore';
 import { motion } from 'framer-motion';
+import store from './redux/store';
+import { Provider } from 'react-redux';
 
 
 export default function Home() {
   return (
-     <>
-      <div className='bg-white'>
+    <Provider store={store}>
+      <div className=''>
         <div>
           <Header item={undefined} />
           
@@ -42,6 +44,6 @@ export default function Home() {
           <Footer />
         </div>
       </div>
-    </>
+    </Provider>
   )
 }
