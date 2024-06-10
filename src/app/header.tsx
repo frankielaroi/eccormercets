@@ -37,7 +37,7 @@ const Header = ({ item }: { item: any }) => {
 
   return (
     <Provider store={store}>
-    <div className="flex flex-row justify-between bg-[#E5E8ED] pt-3">
+    <div className="flex flex-row justify-between pt-3 mx-5">
       <Button onClick={handleDrawerOpen}>
         <Menu sx={{ width: 40, height: 40, color: 'darkblue' }} />
       </Button>

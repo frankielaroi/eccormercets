@@ -26,13 +26,6 @@ const SideDrawer = ({
   );
   const id = useSelector((state: RootState) => state.auth.id);
   useEffect(() => {
-    // Retrieve uid and isLoggedIn from cookies
-    // const storedUid = Cookies.get('uid');
-    //const storedIsLoggedIn = Cookies.get('isLoggedIn');
-
-    // Update state with retrieved values
-    //setUid(storedUid ?? null);
-    //setUserActive(storedIsLoggedIn === 'true');
 
     // Update accountLink based on userActive state
     if (isloggedIn) {
